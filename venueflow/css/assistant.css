@@ -1,0 +1,265 @@
+/* ============================================
+   VenueFlow — Gemini AI Assistant Styles
+   ============================================ */
+
+.assistant-container {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--header-height) - var(--nav-height) - var(--space-3xl));
+  max-height: 600px;
+}
+
+/* ---------- Chat Messages ---------- */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-md) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  scroll-behavior: smooth;
+}
+
+.chat-message {
+  display: flex;
+  gap: var(--space-md);
+  max-width: 88%;
+  animation: slideInUp 0.3s ease forwards;
+}
+
+.chat-message--user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.chat-message--ai {
+  align-self: flex-start;
+}
+
+.chat-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.9rem;
+}
+
+.chat-avatar--user {
+  background: rgba(77, 142, 247, 0.15);
+}
+
+.chat-avatar--ai {
+  background: linear-gradient(135deg, rgba(77, 142, 247, 0.2), rgba(167, 139, 250, 0.2));
+  position: relative;
+  overflow: hidden;
+}
+
+.chat-avatar--ai::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(77, 142, 247, 0.1), rgba(167, 139, 250, 0.1));
+  animation: gradientShift 4s ease infinite;
+  background-size: 200% 200%;
+}
+
+.chat-bubble {
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-xl);
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+}
+
+.chat-message--user .chat-bubble {
+  background: var(--color-accent-blue);
+  color: white;
+  border-bottom-right-radius: var(--radius-sm);
+}
+
+.chat-message--ai .chat-bubble {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-bottom-left-radius: var(--radius-sm);
+}
+
+/* Typing indicator */
+.chat-typing {
+  display: flex;
+  gap: 4px;
+  padding: var(--space-md) var(--space-lg);
+}
+
+.chat-typing__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+  animation: typingBounce 1.2s ease-in-out infinite;
+}
+
+.chat-typing__dot:nth-child(2) { animation-delay: 0.15s; }
+.chat-typing__dot:nth-child(3) { animation-delay: 0.3s; }
+
+/* ---------- Chat Input ---------- */
+.chat-input-container {
+  display: flex;
+  gap: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--glass-border);
+}
+
+.chat-input {
+  flex: 1;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  transition: border-color var(--transition-fast);
+  resize: none;
+}
+
+.chat-input:focus {
+  outline: none;
+  border-color: var(--color-accent-blue);
+  box-shadow: 0 0 0 3px var(--color-accent-blue-glow);
+}
+
+.chat-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.chat-send-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-xl);
+  background: var(--color-accent-blue);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-base);
+  flex-shrink: 0;
+}
+
+.chat-send-btn:hover {
+  background: #3a7ae8;
+  box-shadow: var(--shadow-glow-blue);
+}
+
+.chat-send-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.chat-send-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ---------- Quick Suggestions ---------- */
+.chat-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  padding: var(--space-md) 0;
+}
+
+.chat-suggestion {
+  padding: 6px 14px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.chat-suggestion:hover {
+  background: rgba(77, 142, 247, 0.1);
+  border-color: rgba(77, 142, 247, 0.3);
+  color: var(--color-accent-blue);
+}
+
+/* ---------- Gemini Branding ---------- */
+.gemini-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  padding: var(--space-sm) 0;
+}
+
+.gemini-badge__icon {
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(135deg, #4285f4, #ea4335, #fbbc04, #34a853);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gemini-badge__icon svg {
+  width: 10px;
+  height: 10px;
+  color: white;
+}
+
+/* ---------- Google Maps Container ---------- */
+.maps-container {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  margin-top: var(--space-lg);
+}
+
+.maps-container__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.maps-container__header h3 {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.maps-embed {
+  width: 100%;
+  height: 280px;
+  border: none;
+  filter: brightness(0.85) contrast(1.1) saturate(0.8);
+}
+
+.maps-info {
+  padding: var(--space-md) var(--space-lg);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+}
+
+.maps-info__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.maps-info__item span:first-child {
+  font-size: 1rem;
+}

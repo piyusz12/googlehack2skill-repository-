@@ -1,0 +1,240 @@
+/* ============================================
+   VenueFlow — Venue Map Styles
+   ============================================ */
+
+/* ---------- Map Container ---------- */
+.venue-map-container {
+  position: relative;
+  width: 100%;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  touch-action: pan-x pan-y;
+}
+
+.venue-map-container svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ---------- Map Zones ---------- */
+.map-zone {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  stroke: rgba(255, 255, 255, 0.15);
+  stroke-width: 1;
+}
+
+.map-zone:hover {
+  stroke: rgba(255, 255, 255, 0.4);
+  stroke-width: 2;
+  filter: brightness(1.2);
+}
+
+.map-zone.selected {
+  stroke: var(--color-accent-blue);
+  stroke-width: 2.5;
+  filter: brightness(1.3);
+}
+
+/* ---------- Density Fills ---------- */
+.density-low      { fill: rgba(16, 185, 129, 0.5); }
+.density-medium   { fill: rgba(245, 158, 11, 0.5); }
+.density-high     { fill: rgba(249, 115, 22, 0.55); }
+.density-critical { fill: rgba(239, 68, 68, 0.6); }
+
+/* Animated pulse for critical zones */
+.density-critical {
+  animation: heatmapPulse 2s ease-in-out infinite;
+}
+
+/* ---------- Zone Labels ---------- */
+.map-label {
+  fill: rgba(255, 255, 255, 0.9);
+  font-family: var(--font-family);
+  font-size: 10px;
+  font-weight: 600;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+  letter-spacing: 0.03em;
+}
+
+.map-label--small {
+  font-size: 7px;
+  font-weight: 500;
+  fill: rgba(255, 255, 255, 0.7);
+}
+
+/* ---------- Map Tooltip ---------- */
+.map-tooltip {
+  position: absolute;
+  padding: var(--space-md) var(--space-lg);
+  background: rgba(10, 14, 39, 0.95);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-lg);
+  pointer-events: none;
+  z-index: var(--z-tooltip);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.2s, transform 0.2s;
+  min-width: 180px;
+}
+
+.map-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.map-tooltip__name {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.map-tooltip__type {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--space-sm);
+}
+
+.map-tooltip__stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.map-tooltip__stat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--font-size-xs);
+}
+
+.map-tooltip__stat-label {
+  color: var(--color-text-secondary);
+}
+
+.map-tooltip__stat-value {
+  font-weight: 600;
+}
+
+/* ---------- Map Legend ---------- */
+.map-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--glass-bg);
+  border-top: 1px solid var(--glass-border);
+}
+
+.map-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.map-legend__color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.map-legend__color--low      { background: var(--density-low); }
+.map-legend__color--medium   { background: var(--density-medium); }
+.map-legend__color--high     { background: var(--density-high); }
+.map-legend__color--critical { background: var(--density-critical); }
+
+/* ---------- Phase Indicator on Map ---------- */
+.map-phase-indicator {
+  position: absolute;
+  top: var(--space-md);
+  left: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 6px 14px;
+  background: rgba(10, 14, 39, 0.9);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+  z-index: 10;
+}
+
+.map-phase-indicator__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-accent-emerald);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* ---------- Navigation Route on Map ---------- */
+.route-line {
+  fill: none;
+  stroke: var(--color-accent-blue);
+  stroke-width: 3;
+  stroke-dasharray: 8, 6;
+  stroke-linecap: round;
+  animation: routeMarch 0.8s linear infinite;
+  filter: drop-shadow(0 0 4px var(--color-accent-blue-glow));
+}
+
+.route-start, .route-end {
+  fill: var(--color-accent-blue);
+  stroke: white;
+  stroke-width: 2;
+  filter: drop-shadow(0 0 6px var(--color-accent-blue-glow));
+}
+
+/* ---------- Facility Icons on Map ---------- */
+.map-icon {
+  font-size: 12px;
+  pointer-events: none;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* ---------- Zoom Controls ---------- */
+.map-zoom-controls {
+  position: absolute;
+  bottom: var(--space-md);
+  right: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 10;
+}
+
+.map-zoom-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: rgba(10, 14, 39, 0.9);
+  border: 1px solid var(--glass-border);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all var(--transition-fast);
+}
+
+.map-zoom-btn:hover {
+  background: var(--color-accent-blue);
+  border-color: var(--color-accent-blue);
+}

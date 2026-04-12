@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>VenueFlow — Smart Venue Experience Platform</title>
+  <meta name="description" content="Real-time crowd management, smart queue optimization, AI-powered navigation, and concession pre-ordering for large-scale sporting venues. Powered by Google Gemini.">
+  <meta name="author" content="VenueFlow Team">
+  <meta name="theme-color" content="#060918">
+  <meta name="color-scheme" content="dark">
+
+  <!-- Security: Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com; frame-src https://www.google.com">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="VenueFlow — Smart Venue Experience">
+  <meta property="og:description" content="Transform your stadium experience with real-time crowd heatmaps, smart queue management, and AI-powered navigation.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_US">
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Fonts (Google Fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/venue-map.css">
+  <link rel="stylesheet" href="css/assistant.css">
+
+  <!-- Google Analytics (Google Service) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VENUEFLOW"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-VENUEFLOW', { anonymize_ip: true });
+  </script>
+
+  <!-- Structured Data (SEO) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "VenueFlow",
+    "description": "Smart venue experience platform for large-scale sporting events",
+    "applicationCategory": "SportsApplication",
+    "operatingSystem": "Any",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+</head>
+<body>
+
+<!-- ===== SPLASH SCREEN ===== -->
+<div class="splash-screen" id="splash-screen" role="progressbar" aria-label="Loading VenueFlow">
+  <div class="splash-logo" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+      <path d="M2 17l10 5 10-5"></path>
+      <path d="M2 12l10 5 10-5"></path>
+    </svg>
+  </div>
+  <div class="splash-title">VenueFlow</div>
+  <div class="splash-subtitle">Smart Venue Experience Platform</div>
+  <div class="splash-loader"><div class="splash-loader__bar"></div></div>
+  <div class="splash-google" aria-label="Powered by Google">
+    <span>Powered by</span>
+    <svg width="60" height="20" viewBox="0 0 272 92" xmlns="http://www.w3.org/2000/svg"><path d="M115.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18C71.25 34.32 81.24 25 93.5 25s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44S80.99 39.2 80.99 47.18c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z" fill="#EA4335"/><path d="M163.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18C119.25 34.32 129.24 25 141.5 25s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44s-12.51 5.46-12.51 13.44c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z" fill="#FBBC05"/><path d="M209.75 26.34v39.82c0 16.38-9.66 23.07-21.08 23.07-10.75 0-17.22-7.19-19.66-13.07l8.48-3.53c1.51 3.61 5.21 7.87 11.17 7.87 7.31 0 11.84-4.51 11.84-13v-3.19h-.34c-2.18 2.69-6.38 5.04-11.68 5.04-11.09 0-21.25-9.66-21.25-22.09 0-12.52 10.16-22.26 21.25-22.26 5.29 0 9.49 2.35 11.68 4.96h.34v-3.61h9.25zm-8.56 20.92c0-7.81-5.21-13.52-11.84-13.52-6.72 0-12.35 5.71-12.35 13.52 0 7.73 5.63 13.36 12.35 13.36 6.63 0 11.84-5.63 11.84-13.36z" fill="#4285F4"/><path d="M225 3v65h-9.5V3h9.5z" fill="#34A853"/><path d="M262.02 54.48l7.56 5.04c-2.44 3.61-8.32 9.83-18.48 9.83-12.6 0-22.01-9.74-22.01-22.18 0-13.19 9.49-22.18 20.92-22.18 11.51 0 17.14 9.16 18.98 14.11l1.01 2.52-29.65 12.28c2.27 4.45 5.8 6.72 10.75 6.72 4.96 0 8.4-2.44 10.92-6.14zm-23.27-7.98l19.82-8.23c-1.09-2.77-4.37-4.7-8.23-4.7-4.95 0-11.84 4.37-11.59 12.93z" fill="#EA4335"/><path d="M35.29 41.19V32H67c.31 1.64.47 3.58.47 5.68 0 7.06-1.93 15.79-8.15 22.01-6.05 6.3-13.78 9.66-24.02 9.66C16.32 69.35.36 53.89.36 34.91.36 15.93 16.32.47 35.3.47c10.5 0 17.98 4.12 23.6 9.49l-6.64 6.64c-4.03-3.78-9.49-6.72-16.97-6.72-13.86 0-24.7 11.17-24.7 25.03 0 13.86 10.84 25.03 24.7 25.03 8.99 0 14.11-3.61 17.39-6.89 2.66-2.66 4.41-6.46 5.1-11.65l-22.49-.01z" fill="#4285F4"/></svg>
+  </div>
+</div>
+
+<!-- ===== SKIP NAVIGATION (Accessibility) ===== -->
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<div id="app">
+  <!-- ===== HEADER ===== -->
+  <header class="app-header" role="banner">
+    <div class="app-header__logo" aria-label="VenueFlow">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+        <path d="M2 17l10 5 10-5"></path>
+        <path d="M2 12l10 5 10-5"></path>
+      </svg>
+      VenueFlow
+      <span class="app-header__badge" aria-label="Live status">Live</span>
+    </div>
+    <div class="app-header__right">
+      <!-- Accessibility Controls -->
+      <div class="a11y-controls" role="toolbar" aria-label="Accessibility controls">
+        <button class="a11y-btn" id="a11y-font-down" aria-label="Decrease font size" title="Decrease font size">A-</button>
+        <button class="a11y-btn" id="a11y-font-up" aria-label="Increase font size" title="Increase font size">A+</button>
+        <button class="a11y-btn" id="a11y-contrast" aria-label="Toggle high contrast mode" aria-pressed="false" title="High contrast">◑</button>
+      </div>
+      <div class="app-header__phase" aria-live="polite">
+        <span class="app-header__phase-dot" aria-hidden="true"></span>
+        <span id="header-phase-text">Pre-Game</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="app-main" id="main-content" role="main">
+
+    <!-- DASHBOARD VIEW -->
+    <section class="view active" id="view-dashboard" aria-label="Dashboard">
+      <h1 class="section-title" style="font-size:var(--font-size-xl)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>
+        Dashboard
+      </h1>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid" role="region" aria-label="Live venue statistics">
+        <div class="card card--stat stagger-1 animate-slide-up" role="status">
+          <div class="card__icon card__icon--blue" aria-hidden="true">👥</div>
+          <div class="card__value" id="stat-attendees" aria-label="Total attendees">0</div>
+          <div class="card__label">Attendees</div>
+        </div>
+        <div class="card card--stat stagger-2 animate-slide-up" role="status">
+          <div class="card__icon card__icon--amber" aria-hidden="true">📊</div>
+          <div class="card__value" id="stat-density" aria-label="Average crowd density">0%</div>
+          <div class="card__label">Avg Density</div>
+        </div>
+        <div class="card card--stat stagger-3 animate-slide-up" role="status">
+          <div class="card__icon card__icon--emerald" aria-hidden="true">⏱️</div>
+          <div class="card__value" id="stat-wait" aria-label="Average wait time">0 min</div>
+          <div class="card__label">Avg Wait</div>
+        </div>
+        <div class="card card--stat stagger-4 animate-slide-up" role="status">
+          <div class="card__icon card__icon--red" aria-hidden="true">🔥</div>
+          <div class="card__value" id="stat-hotspots" aria-label="Number of hot spots">0</div>
+          <div class="card__label">Hot Spots</div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="quick-actions" role="group" aria-label="Quick navigation actions">
+        <button class="quick-action stagger-1 animate-slide-up" data-navigate="map" aria-label="View crowd map">
+          <div class="quick-action__icon" style="background:rgba(77,142,247,0.15)" aria-hidden="true">🗺️</div>
+          <span class="quick-action__label">Crowd Map</span>
+        </button>
+        <button class="quick-action stagger-2 animate-slide-up" data-navigate="queues" aria-label="View wait times">
+          <div class="quick-action__icon" style="background:rgba(247,184,77,0.15)" aria-hidden="true">⏱️</div>
+          <span class="quick-action__label">Wait Times</span>
+        </button>
+        <button class="quick-action stagger-3 animate-slide-up" data-navigate="order" aria-label="Order food">
+          <div class="quick-action__icon" style="background:rgba(52,211,153,0.15)" aria-hidden="true">🍔</div>
+          <span class="quick-action__label">Order Food</span>
+        </button>
+      </div>
+
+      <!-- Hot Zones -->
+      <div class="hot-zones stagger-5 animate-slide-up" role="region" aria-label="Hot zones">
+        <div class="card__header">
+          <span class="card__title">🔥 Hot Zones</span>
+          <span class="badge badge--critical"><span class="badge__dot" aria-hidden="true"></span> Live</span>
+        </div>
+        <div id="hot-zones-list" role="list" aria-live="polite"></div>
+      </div>
+
+      <!-- Event Timeline -->
+      <div class="timeline stagger-6 animate-slide-up" role="region" aria-label="Event timeline">
+        <div class="timeline__header">
+          <span class="timeline__title">⏳ Event Timeline</span>
+        </div>
+        <div class="timeline__phases" role="progressbar" aria-label="Match progress">
+          <div class="timeline__phase active" id="phase-item-0">
+            <div class="timeline__phase-bar active" id="phase-bar-0"></div>
+            <span class="timeline__phase-label">Pre-Game</span>
+          </div>
+          <div class="timeline__phase" id="phase-item-1">
+            <div class="timeline__phase-bar" id="phase-bar-1"></div>
+            <span class="timeline__phase-label">1st Half</span>
+          </div>
+          <div class="timeline__phase" id="phase-item-2">
+            <div class="timeline__phase-bar" id="phase-bar-2"></div>
+            <span class="timeline__phase-label">Halftime</span>
+          </div>
+          <div class="timeline__phase" id="phase-item-3">
+            <div class="timeline__phase-bar" id="phase-bar-3"></div>
+            <span class="timeline__phase-label">2nd Half</span>
+          </div>
+          <div class="timeline__phase" id="phase-item-4">
+            <div class="timeline__phase-bar" id="phase-bar-4"></div>
+            <span class="timeline__phase-label">Post-Game</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Google Maps Integration -->
+      <div class="maps-container stagger-7 animate-slide-up" role="region" aria-label="Venue location">
+        <div class="maps-container__header">
+          <h3><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> Venue Location</h3>
+          <span class="badge badge--blue">Google Maps</span>
+        </div>
+        <iframe
+          class="maps-embed"
+          title="Venue location on Google Maps"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.019284092057!2d-122.3916756!3d37.7830208!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8085807abad77c31%3A0x3f10e4b3a7f285!2sOracle%20Park!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen>
+        </iframe>
+        <div class="maps-info">
+          <div class="maps-info__item"><span aria-hidden="true">📍</span> Oracle Park, San Francisco</div>
+          <div class="maps-info__item"><span aria-hidden="true">🅿️</span> Lots A-F Available</div>
+          <div class="maps-info__item"><span aria-hidden="true">🚇</span> BART: Embarcadero</div>
+          <div class="maps-info__item"><span aria-hidden="true">🚗</span> I-280 / US-101</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAP VIEW -->
+    <section class="view" id="view-map" aria-label="Venue Map">
+      <h1 class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+        Venue Map — Live Heatmap
+      </h1>
+      <div class="venue-map-container" id="map-container" role="img" aria-label="Interactive venue heatmap showing crowd density across all zones"></div>
+    </section>
+
+    <!-- QUEUES VIEW -->
+    <section class="view" id="view-queues" aria-label="Smart Queues">
+      <h1 class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        Smart Queues — Live Wait Times
+      </h1>
+      <div id="queue-container" role="region" aria-label="Queue wait times"></div>
+    </section>
+
+    <!-- ORDER VIEW -->
+    <section class="view" id="view-order" aria-label="Food Ordering">
+      <h1 class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        Order Food — Skip the Line
+      </h1>
+      <div id="order-container" role="region" aria-label="Food menu and ordering"></div>
+    </section>
+
+    <!-- FEED VIEW -->
+    <section class="view" id="view-feed" aria-label="Live Feed">
+      <div id="feed-container" role="region" aria-label="Live match feed and scoreboard"></div>
+    </section>
+
+    <!-- NAVIGATE VIEW -->
+    <section class="view" id="view-navigate" aria-label="Navigation">
+      <h1 class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+        Navigate — Crowd-Optimized Routes
+      </h1>
+      <div id="nav-container" role="region" aria-label="Route planner"></div>
+    </section>
+
+    <!-- AI ASSISTANT VIEW (Google Gemini) -->
+    <section class="view" id="view-assistant" aria-label="AI Assistant">
+      <h1 class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        AI Venue Assistant
+      </h1>
+      <div id="assistant-container" role="region" aria-label="AI-powered venue assistant chat"></div>
+    </section>
+
+  </main>
+
+  <!-- ===== BOTTOM NAVIGATION ===== -->
+  <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
+    <button class="bottom-nav__item active" data-view="dashboard" id="nav-dashboard" aria-label="Dashboard" aria-current="page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>
+      Home
+    </button>
+    <button class="bottom-nav__item" data-view="map" id="nav-map" aria-label="Venue Map">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+      Map
+    </button>
+    <button class="bottom-nav__item" data-view="queues" id="nav-queues" aria-label="Queue wait times">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+      Queues
+    </button>
+    <button class="bottom-nav__item" data-view="order" id="nav-order" aria-label="Order food">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+      Order
+    </button>
+    <button class="bottom-nav__item" data-view="feed" id="nav-feed" aria-label="Live match feed">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      Feed
+    </button>
+    <button class="bottom-nav__item" data-view="navigate" id="nav-navigate" aria-label="Navigate venue">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+      Navigate
+    </button>
+    <button class="bottom-nav__item" data-view="assistant" id="nav-assistant" aria-label="AI Assistant powered by Google Gemini">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+      AI
+    </button>
+  </nav>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container" aria-live="assertive" aria-atomic="true" role="alert"></div>
+</div>
+
+<!-- ARIA Live Region for Screen Readers -->
+<div id="a11y-announcer" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+<!-- Scripts (ordered by dependency) -->
+<script src="js/utils.js"></script>
+<script src="js/crowd-simulator.js"></script>
+<script src="js/venue-map.js"></script>
+<script src="js/queue-manager.js"></script>
+<script src="js/navigation.js"></script>
+<script src="js/pre-order.js"></script>
+<script src="js/live-feed.js"></script>
+<script src="js/gemini-assistant.js"></script>
+<script src="js/accessibility.js"></script>
+<script src="js/test-suite.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
