@@ -1,7 +1,7 @@
 {
-  "name": "Narendra Modi Stadium Experience",
-  "short_name": "Modi Stadium",
-  "description": "Real-time crowd management and navigation for Narendra Modi Stadium.",
+  "name": "ICC T20 World Cup 2026 Live",
+  "short_name": "T20WC 2026",
+  "description": "Real-time T20 World Cup experience, India vs Pakistan live updates, and smart stadium navigation.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#060918",

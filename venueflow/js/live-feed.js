@@ -111,6 +111,9 @@ const LiveFeed = (() => {
     // Draggable Functionality
     const floatEl = document.getElementById('floating-scoreboard');
     if (floatEl) {
+      floatEl.setAttribute('role', 'region');
+      floatEl.setAttribute('aria-label', 'Floating match scoreboard');
+      
       floatEl.addEventListener('mousedown', (e) => {
         // Don't start drag if clicking the toggle button
         if (e.target.closest('#fs-toggle-btn')) return;
@@ -186,7 +189,7 @@ const LiveFeed = (() => {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
         Live Feed
       </div>
-      <div id="feed-list"></div>
+      <div id="feed-list" role="list" aria-label="Match live events"></div>
       
       <div class="lineups-section">
         <div class="section-title">
