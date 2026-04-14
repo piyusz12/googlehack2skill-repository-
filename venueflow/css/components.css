@@ -1203,3 +1203,196 @@
 .category-tab__emoji {
   font-size: 1.25rem;
 }
+
+/* ---------- Floating Scoreboard ---------- */
+.floating-scoreboard {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 16px;
+  z-index: 1000;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  width: 250px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  color: white;
+  cursor: grab;
+  user-select: none;
+}
+
+.floating-scoreboard:active {
+  cursor: grabbing;
+}
+
+.floating-scoreboard.hidden {
+  transform: translateY(150%);
+  opacity: 0;
+}
+
+.floating-scoreboard__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--color-accent-blue);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 4px;
+}
+
+.floating-scoreboard__toggle {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.floating-scoreboard__score {
+  font-size: 1.5rem;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 4px;
+}
+
+.floating-scoreboard__overs {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.floating-scoreboard__players {
+  font-size: 0.85rem;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(255,255,255,0.1);
+  color: #ccc;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.floating-scoreboard__players span strong {
+  color: white;
+}
+
+/* ---------- Team Lineups ---------- */
+.lineups-section {
+  margin-top: var(--space-xl);
+  padding: var(--space-lg);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+}
+
+.lineups-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
+}
+
+@media (max-width: 600px) {
+  .lineups-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lineup-team__title {
+  font-size: var(--font-size-md);
+  margin-bottom: var(--space-md);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: var(--space-xs);
+}
+
+.lineup-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lineup-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  background: rgba(255,255,255,0.03);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.lineup-item:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.1);
+}
+
+.lineup-item__name {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.badge--powerplay {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+  animation: pulse 2s infinite;
+}
+
+.floating-scoreboard__target {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fbbf24;
+  margin: 10px 0;
+  text-align: center;
+  background: rgba(251, 191, 36, 0.1);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed rgba(251, 191, 36, 0.3);
+}
+
+.floating-scoreboard__stats {
+  font-size: 0.8rem;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  justify-content: space-between;
+  color: var(--color-text-muted);
+}
+
+.feed-item__cricket-meta {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  align-items: center;
+}
+
+.feed-item__over-ball {
+  background: rgba(45, 212, 191, 0.1);
+  color: #2dd4bf;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.feed-item__players {
+  opacity: 0.8;
+  font-style: italic;
+}

@@ -9,43 +9,58 @@ const PreOrder = (() => {
   let currentCategory = 'burgers';
 
   const MENU = {
-    burgers: [
-      { id: 'b1', name: 'Classic Burger',   price: 9.99,  emoji: '🍔' },
-      { id: 'b2', name: 'Cheese Burger',    price: 10.99, emoji: '🧀' },
-      { id: 'b3', name: 'BBQ Bacon Burger', price: 12.99, emoji: '🥓' },
-      { id: 'b4', name: 'Veggie Burger',    price: 10.49, emoji: '🥬' },
+    mains: [
+      { id: 'b1', name: 'Veg Biryani',        price: 250, emoji: '🍲' },
+      { id: 'b2', name: 'Pav Bhaji',          price: 180, emoji: '🍞' },
+      { id: 'b3', name: 'Chole Bhature',      price: 200, emoji: '🫓' },
+      { id: 'b4', name: 'Paneer Tikka Roll',  price: 150, emoji: '🌯' },
+      { id: 'b5', name: 'Rajma Chawal',       price: 220, emoji: '🍛' },
+      { id: 'b6', name: 'Chicken Biryani',    price: 300, emoji: '🍗' },
+      { id: 'b7', name: 'Butter Naan Set',    price: 190, emoji: '🫓' },
+      { id: 'b8', name: 'Masala Dosa',        price: 160, emoji: '🥞' },
     ],
     pizza: [
-      { id: 'p1', name: 'Margherita',       price: 8.99,  emoji: '🍕' },
-      { id: 'p2', name: 'Pepperoni',        price: 10.99, emoji: '🍕' },
-      { id: 'p3', name: 'BBQ Chicken',      price: 11.99, emoji: '🍗' },
-      { id: 'p4', name: 'Hawaiian',         price: 10.49, emoji: '🍍' },
+      { id: 'p1', name: 'Paneer Makhani',     price: 350, emoji: '🍕' },
+      { id: 'p2', name: 'Spicy Veggie',       price: 300, emoji: '🍕' },
+      { id: 'p3', name: 'Tandoori Chicken',   price: 400, emoji: '🍗' },
+      { id: 'p4', name: 'Margherita',         price: 250, emoji: '🍕' },
+      { id: 'p5', name: 'Chicken Tikka',      price: 380, emoji: '🍕' },
+      { id: 'p6', name: 'Corn & Cheese',      price: 280, emoji: '🌽' },
     ],
     snacks: [
-      { id: 's1', name: 'Loaded Nachos',    price: 7.99,  emoji: '🧀' },
-      { id: 's2', name: 'Soft Pretzel',     price: 5.99,  emoji: '🥨' },
-      { id: 's3', name: 'Chicken Tenders',  price: 8.99,  emoji: '🍗' },
-      { id: 's4', name: 'French Fries',     price: 4.99,  emoji: '🍟' },
+      { id: 's1', name: 'Samosa (2pc)',       price: 80,  emoji: '🥟' },
+      { id: 's2', name: 'Vada Pav',           price: 60,  emoji: '🍔' },
+      { id: 's3', name: 'Aloo Tikki Chaat',   price: 120, emoji: '🥗' },
+      { id: 's4', name: 'French Fries',       price: 100, emoji: '🍟' },
+      { id: 's5', name: 'Bhel Puri',          price: 70,  emoji: '🥣' },
+      { id: 's6', name: 'Pani Puri (6pc)',    price: 60,  emoji: '🧆' },
+      { id: 's7', name: 'Khandvi',            price: 90,  emoji: '🥞' },
+      { id: 's8', name: 'Dhokla',             price: 80,  emoji: '🧽' },
     ],
     drinks: [
-      { id: 'd1', name: 'Craft Beer',       price: 8.99,  emoji: '🍺' },
-      { id: 'd2', name: 'Soda (Large)',     price: 4.49,  emoji: '🥤' },
-      { id: 'd3', name: 'Lemonade',         price: 3.99,  emoji: '🍋' },
-      { id: 'd4', name: 'Water Bottle',     price: 2.99,  emoji: '💧' },
+      { id: 'd1', name: 'Masala Chai',        price: 40,  emoji: '☕' },
+      { id: 'd2', name: 'Filter Coffee',      price: 50,  emoji: '☕' },
+      { id: 'd3', name: 'Sweet Lassi',        price: 80,  emoji: '🥛' },
+      { id: 'd4', name: 'Water Bottle',       price: 20,  emoji: '💧' },
+      { id: 'd5', name: 'Aam Panna',          price: 60,  emoji: '🥭' },
+      { id: 'd6', name: 'Lemon Soda',         price: 50,  emoji: '🍋' },
+      { id: 'd7', name: 'Thumbs Up',          price: 60,  emoji: '🥤' },
     ],
     desserts: [
-      { id: 'x1', name: 'Ice Cream Sundae', price: 6.99,  emoji: '🍨' },
-      { id: 'x2', name: 'Churros',          price: 5.49,  emoji: '🥐' },
-      { id: 'x3', name: 'Cotton Candy',     price: 4.99,  emoji: '🍭' },
-      { id: 'x4', name: 'Cookies',          price: 3.99,  emoji: '🍪' },
+      { id: 'x1', name: 'Gulab Jamun (2pc)',  price: 60,  emoji: '🥣' },
+      { id: 'x2', name: 'Jalebi',             price: 80,  emoji: '🥨' },
+      { id: 'x3', name: 'Kulfi Falooda',      price: 120, emoji: '🍨' },
+      { id: 'x4', name: 'Cotton Candy',       price: 40,  emoji: '🍭' },
+      { id: 'x5', name: 'Rasmalai (2pc)',     price: 100, emoji: '🥘' },
+      { id: 'x6', name: 'Gajar Ka Halwa',     price: 90,  emoji: '🥕' },
     ],
   };
 
   const CATEGORIES = [
-    { id: 'burgers',  emoji: '🍔', label: 'Burgers' },
+    { id: 'mains',    emoji: '🍲', label: 'Mains' },
     { id: 'pizza',    emoji: '🍕', label: 'Pizza' },
     { id: 'snacks',   emoji: '🍟', label: 'Snacks' },
-    { id: 'drinks',   emoji: '🍺', label: 'Drinks' },
+    { id: 'drinks',   emoji: '☕', label: 'Drinks' },
     { id: 'desserts', emoji: '🍨', label: 'Desserts' },
   ];
 
@@ -165,7 +180,7 @@ const PreOrder = (() => {
 
   function renderCart() {
     const subtotal = cart.reduce((sum, c) => sum + c.price * c.qty, 0);
-    const tax = subtotal * 0.08;
+    const tax = subtotal * 0.18; // 18% GST calculation
     const total = subtotal + tax;
 
     // Find recommended pickup
@@ -206,7 +221,7 @@ const PreOrder = (() => {
           <span>${Utils.formatCurrency(subtotal)}</span>
         </div>
         <div class="cart__total" style="border-top:none;padding-top:0;margin-top:0;font-size:var(--font-size-xs);color:var(--color-text-secondary);font-weight:400">
-          <span>Tax (8%)</span>
+          <span>GST (18%)</span>
           <span>${Utils.formatCurrency(tax)}</span>
         </div>
         <div class="cart__total" style="border-top:1px solid rgba(255,255,255,0.08)">
@@ -229,7 +244,7 @@ const PreOrder = (() => {
 
     activeOrder = {
       items: [...cart],
-      total: cart.reduce((sum, c) => sum + c.price * c.qty, 0) * 1.08,
+      total: cart.reduce((sum, c) => sum + c.price * c.qty, 0) * 1.18,
       status: 'placed', // placed → preparing → ready
       pickup: pickupStand?.name || 'Stand',
       timestamp: Date.now(),

@@ -84,7 +84,7 @@ const Utils = (() => {
 
   /** @param {number} n @returns {string} */
   function formatCurrency(n) {
-    return '$' + n.toFixed(2);
+    return '₹' + Math.round(n).toString();
   }
 
   /** @param {number} n @returns {string} */

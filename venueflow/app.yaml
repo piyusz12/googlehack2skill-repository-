@@ -1,0 +1,8 @@
+runtime: python39
+handlers:
+  - url: /
+    static_files: venueflow/index.html
+    upload: venueflow/index.html
+  - url: /(.*)
+    static_files: venueflow/\1
+    upload: venueflow/(.*)

@@ -67,25 +67,40 @@ const VenueMap = (() => {
     });
     svgEl.appendChild(outline);
 
-    // Inner field
+    // Inner field (Cricket Oval)
     const field = createSVGElement('ellipse', {
-      cx: 420, cy: 230, rx: 160, ry: 110,
+      cx: 420, cy: 230, rx: 170, ry: 130,
       fill: '#0f4d2a', stroke: 'rgba(255,255,255,0.1)', 'stroke-width': 1
     });
     svgEl.appendChild(field);
 
-    // Field lines
-    const midLine = createSVGElement('line', {
-      x1: 420, y1: 120, x2: 420, y2: 340,
-      stroke: 'rgba(255,255,255,0.2)', 'stroke-width': 1
+    // 30-yard circle
+    const thirtyYard = createSVGElement('ellipse', {
+      cx: 420, cy: 230, rx: 90, ry: 60,
+      fill: 'none', stroke: 'rgba(255,255,255,0.3)', 'stroke-width': 1,
+      'stroke-dasharray': '5,5'
     });
-    svgEl.appendChild(midLine);
+    svgEl.appendChild(thirtyYard);
 
-    const centerCircle = createSVGElement('circle', {
-      cx: 420, cy: 230, r: 30,
-      fill: 'none', stroke: 'rgba(255,255,255,0.2)', 'stroke-width': 1
+    // Cricket Pitch
+    const pitch = createSVGElement('rect', {
+      x: 412, y: 190, width: 16, height: 80,
+      fill: '#a68c69', stroke: 'rgba(255,255,255,0.2)', 'stroke-width': 1
     });
-    svgEl.appendChild(centerCircle);
+    svgEl.appendChild(pitch);
+    
+    // Creases
+    const topCrease = createSVGElement('line', {
+      x1: 410, y1: 196, x2: 430, y2: 196,
+      stroke: '#ffffff', 'stroke-width': 1
+    });
+    svgEl.appendChild(topCrease);
+    
+    const bottomCrease = createSVGElement('line', {
+      x1: 410, y1: 264, x2: 430, y2: 264,
+      stroke: '#ffffff', 'stroke-width': 1
+    });
+    svgEl.appendChild(bottomCrease);
 
     // "VENUEFLOW" text
     const titleText = createSVGElement('text', {
@@ -171,7 +186,7 @@ const VenueMap = (() => {
     });
 
     const shortLabels = {
-      seating: zone.name.replace('Section ', ''),
+      seating: zone.name.split(' ').map(w => w[0]).join(''),
       concourse: zone.name.replace(' Concourse', ''),
       gate: zone.name.replace('Gate ', 'G'),
       food: '🍔',

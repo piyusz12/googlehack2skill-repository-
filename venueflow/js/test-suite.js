@@ -217,7 +217,7 @@ const TestSuite = (() => {
     assertEqual(Utils.formatNumber(1500), '1.5k', 'formatNumber(1500) = "1.5k"');
 
     // Format currency
-    assertEqual(Utils.formatCurrency(9.99), '$9.99', 'formatCurrency(9.99) = "$9.99"');
+    assertEqual(Utils.formatCurrency(9.99), '₹10', 'formatCurrency(9.99) = "₹10"');
 
     // Format percent
     assertEqual(Utils.formatPercent(75.3), '75%', 'formatPercent(75.3) = "75%"');

@@ -26,7 +26,7 @@ const GeminiAssistant = (() => {
     'Where is the shortest food queue?',
     'Navigate me to my seat in Section A',
     'What\'s the current crowd level?',
-    'When is halftime?',
+    'When is the innings break?',
     'Any food deals right now?',
     'Where are the nearest restrooms?',
   ];
@@ -122,11 +122,17 @@ const GeminiAssistant = (() => {
     }
 
     // --- Phase / Schedule Queries ---
-    if (q.includes('halftime') || q.includes('half time') || q.includes('break') || q.includes('phase') || q.includes('schedule')) {
-      return `⏳ We're currently in **${phase.label}**. ` +
-        `The match follows 5 phases: Pre-Game → 1st Half (45') → Halftime (15') → 2nd Half (45') → Post-Game. ` +
-        `Check the **Event Timeline** on the Dashboard for live progress! ` +
-        `Pro tip: Pre-order your halftime snacks during the 1st half to avoid the rush! 🍕`;
+    if (q.includes('inning') || q.includes('break') || q.includes('phase') || q.includes('schedule') || q.includes('match')) {
+      return `⏳ We're currently watching the **ICC Men's T20 World Cup 2026** (Feb 14) between India and Pakistan! ` +
+        `Current Match Phase: **${phase.label}**. ` +
+        `The T20 format has 2 innings of 20 overs each. ` +
+        `Pro tip: Keep an eye on the **Powerplay** (first 6 overs) where scoring usually accelerates! 🏏`;
+    }
+
+    // --- Date / World Cup Queries ---
+    if (q.includes('date') || q.includes('world cup') || q.includes('today') || q.includes('when')) {
+      return `📅 Today is **February 14, 2026**, and you are at the Narendra Modi Stadium for the Group A clash of the **ICC Men's T20 World Cup**! ` +
+        `It is the biggest match of the tournament so far. India and Pakistan are facing off in this high-intensity T20 encounter!`;
     }
 
     // --- Parking / Exit Queries ---

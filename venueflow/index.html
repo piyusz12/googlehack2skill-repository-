@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>VenueFlow — Smart Venue Experience Platform</title>
-  <meta name="description" content="Real-time crowd management, smart queue optimization, AI-powered navigation, and concession pre-ordering for large-scale sporting venues. Powered by Google Gemini.">
+  <title>ICC T20 World Cup 2026 | Narendra Modi Stadium</title>
+  <meta name="description" content="Feb 14, 2026: Live T20 World Cup experience at Narendra Modi Stadium. Real-time scores, India vs Pakistan updates, and crowd management.">
   <meta name="author" content="VenueFlow Team">
   <meta name="theme-color" content="#060918">
   <meta name="color-scheme" content="dark">
 
   <!-- Security: Content Security Policy -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com; frame-src https://www.google.com">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com; frame-src https://www.google.com https://maps.google.com">
 
   <!-- Open Graph -->
-  <meta property="og:title" content="VenueFlow — Smart Venue Experience">
-  <meta property="og:description" content="Transform your stadium experience with real-time crowd heatmaps, smart queue management, and AI-powered navigation.">
+  <meta property="og:title" content="ICC T20 World Cup 2026 Live — VenueFlow">
+  <meta property="og:description" content="Experience India vs Pakistan live on Feb 14, 2026 with real-time crowd heatmaps and ball-by-ball updates.">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="en_US">
 
@@ -53,7 +53,7 @@
     "description": "Smart venue experience platform for large-scale sporting events",
     "applicationCategory": "SportsApplication",
     "operatingSystem": "Any",
-    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" }
   }
   </script>
 </head>
@@ -81,6 +81,9 @@
 <a href="#main-content" class="skip-link">Skip to main content</a>
 
 <div id="app">
+  <!-- Floating Scoreboard Widget -->
+  <div id="floating-scoreboard" class="floating-scoreboard"></div>
+
   <!-- ===== HEADER ===== -->
   <header class="app-header" role="banner">
     <div class="app-header__logo" aria-label="VenueFlow">
@@ -90,7 +93,7 @@
         <path d="M2 12l10 5 10-5"></path>
       </svg>
       VenueFlow
-      <span class="app-header__badge" aria-label="Live status">Live</span>
+      <span class="app-header__badge" aria-label="Live status">World Cup Live</span>
     </div>
     <div class="app-header__right">
       <!-- Accessibility Controls -->
@@ -101,7 +104,7 @@
       </div>
       <div class="app-header__phase" aria-live="polite">
         <span class="app-header__phase-dot" aria-hidden="true"></span>
-        <span id="header-phase-text">Pre-Game</span>
+        <span id="header-phase-text">Pre-Match</span>
       </div>
     </div>
   </header>
@@ -174,23 +177,23 @@
         <div class="timeline__phases" role="progressbar" aria-label="Match progress">
           <div class="timeline__phase active" id="phase-item-0">
             <div class="timeline__phase-bar active" id="phase-bar-0"></div>
-            <span class="timeline__phase-label">Pre-Game</span>
+            <span class="timeline__phase-label">Pre-Match</span>
           </div>
           <div class="timeline__phase" id="phase-item-1">
             <div class="timeline__phase-bar" id="phase-bar-1"></div>
-            <span class="timeline__phase-label">1st Half</span>
+            <span class="timeline__phase-label">1st Inning</span>
           </div>
           <div class="timeline__phase" id="phase-item-2">
             <div class="timeline__phase-bar" id="phase-bar-2"></div>
-            <span class="timeline__phase-label">Halftime</span>
+            <span class="timeline__phase-label">Innings Break</span>
           </div>
           <div class="timeline__phase" id="phase-item-3">
             <div class="timeline__phase-bar" id="phase-bar-3"></div>
-            <span class="timeline__phase-label">2nd Half</span>
+            <span class="timeline__phase-label">2nd Inning</span>
           </div>
           <div class="timeline__phase" id="phase-item-4">
             <div class="timeline__phase-bar" id="phase-bar-4"></div>
-            <span class="timeline__phase-label">Post-Game</span>
+            <span class="timeline__phase-label">Post-Match</span>
           </div>
         </div>
       </div>
@@ -201,19 +204,26 @@
           <h3><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> Venue Location</h3>
           <span class="badge badge--blue">Google Maps</span>
         </div>
+        <div class="maps-search">
+          <div class="search-input-wrapper">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" class="search-input" placeholder="Search near venue..." aria-label="Search maps">
+            <button class="btn btn--primary btn--sm search-btn" type="button">Search</button>
+          </div>
+        </div>
         <iframe
           class="maps-embed"
           title="Venue location on Google Maps"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.019284092057!2d-122.3916756!3d37.7830208!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8085807abad77c31%3A0x3f10e4b3a7f285!2sOracle%20Park!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus"
+          src="https://maps.google.com/maps?width=100%25&amp;height=600&amp;hl=en&amp;q=Narendra%20Modi%20Stadium,%20Ahmedabad+(Narendra%20Modi%20Stadium)&amp;t=&amp;z=15&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
           loading="lazy"
           referrerpolicy="no-referrer-when-downgrade"
           allowfullscreen>
         </iframe>
         <div class="maps-info">
-          <div class="maps-info__item"><span aria-hidden="true">📍</span> Oracle Park, San Francisco</div>
-          <div class="maps-info__item"><span aria-hidden="true">🅿️</span> Lots A-F Available</div>
-          <div class="maps-info__item"><span aria-hidden="true">🚇</span> BART: Embarcadero</div>
-          <div class="maps-info__item"><span aria-hidden="true">🚗</span> I-280 / US-101</div>
+          <div class="maps-info__item"><span aria-hidden="true">📍</span> Narendra Modi Stadium, Ahmedabad</div>
+          <div class="maps-info__item"><span aria-hidden="true">🅿️</span> Lots 1-4 Available</div>
+          <div class="maps-info__item"><span aria-hidden="true">🚇</span> Metro: Motera Stadium Station</div>
+          <div class="maps-info__item"><span aria-hidden="true">🚗</span> Sardar Patel Ring Road / SG Highway</div>
         </div>
       </div>
     </section>

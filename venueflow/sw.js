@@ -6,7 +6,7 @@
    strategy for static assets.
    ============================================ */
 
-const CACHE_NAME = 'venueflow-v2.1.0';
+const CACHE_NAME = 'venueflow-v3.8.1';
 const STATIC_ASSETS = [
   './',
   './index.html',

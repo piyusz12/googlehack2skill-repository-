@@ -1,7 +1,7 @@
 {
-  "name": "VenueFlow — Smart Venue Experience",
-  "short_name": "VenueFlow",
-  "description": "Real-time crowd management, smart queues, AI navigation, and concession pre-ordering for large-scale sporting venues.",
+  "name": "Narendra Modi Stadium Experience",
+  "short_name": "Modi Stadium",
+  "description": "Real-time crowd management and navigation for Narendra Modi Stadium.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#060918",
