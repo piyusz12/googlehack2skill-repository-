@@ -1,8 +1,30 @@
 runtime: python39
+
 handlers:
+  # Serve static CSS files
+  - url: /css
+    static_dir: css
+
+  # Serve static JS files
+  - url: /js
+    static_dir: js
+
+  # Serve the service worker at root
+  - url: /sw.js
+    static_files: sw.js
+    upload: sw\.js
+
+  # Serve the PWA manifest
+  - url: /manifest.json
+    static_files: manifest.json
+    upload: manifest\.json
+
+  # Serve the root index.html
   - url: /
-    static_files: venueflow/index.html
-    upload: venueflow/index.html
+    static_files: index.html
+    upload: index\.html
+
+  # Catch-all for any other static files at root
   - url: /(.*)
-    static_files: venueflow/\1
-    upload: venueflow/(.*)
+    static_files: \1
+    upload: (.*)
