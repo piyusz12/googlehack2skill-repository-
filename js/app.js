@@ -2,7 +2,15 @@
    VenueFlow — Main App Controller
    ============================================
    @description Controls view routing, component lifecycle,
-   global state management, and Google services integration.
+   global state management, and Google Cloud services integration.
+   
+   Orchestrates initialization of:
+   - Firebase (Auth, Firestore, Analytics, Performance, Messaging)
+   - Google Cloud Services (Gemini AI, Translation, TTS, Maps)
+   - Crowd Simulation Engine
+   - All UI components (Map, Queues, Navigation, Orders, Feed, AI)
+   - Accessibility Manager
+   - Service Worker (PWA)
    
    @author VenueFlow Team
    @version 2.0.0
@@ -17,63 +25,143 @@ const App = (() => {
   /** @private {string} Currently active view */
   let currentView = 'dashboard';
 
+  /** @private {number} Crowd snapshot save interval */
+  let snapshotInterval = null;
+
   /**
    * Initialize the application
    * Orchestrates all component initialization in correct order.
    */
-  function init() {
+  async function init() {
     try {
       // 1. Initialize accessibility first (must be ready before other components)
       if (typeof AccessibilityManager !== 'undefined') {
         AccessibilityManager.init();
       }
 
-      // 2. Setup navigation
+      // 2. Initialize Firebase Services (Google Cloud)
+      if (typeof FirebaseService !== 'undefined') {
+        const firebaseReady = await FirebaseService.init();
+        console.log(firebaseReady 
+          ? '🔥 Firebase services connected' 
+          : '🔥 Firebase running in demo mode');
+        
+        // Load saved user preferences
+        const prefs = await FirebaseService.loadPreferences();
+        if (prefs) {
+          if (prefs.highContrast && typeof AccessibilityManager !== 'undefined') {
+            AccessibilityManager.toggleHighContrast(true);
+          }
+          if (prefs.fontScale && typeof AccessibilityManager !== 'undefined') {
+            AccessibilityManager.setFontScale(prefs.fontScale);
+          }
+        }
+      }
+
+      // 3. Setup navigation
       setupNavigation();
 
-      // 3. Start crowd simulation engine
+      // 4. Start crowd simulation engine
       CrowdSimulator.start();
 
-      // 4. Initialize UI components
+      // 5. Initialize UI components
       VenueMap.init('map-container');
       QueueManager.init('queue-container');
       Navigation.init('nav-container');
       PreOrder.init('order-container');
       LiveFeed.init('feed-container');
 
-      // 5. Initialize Google Services
+      // 6. Initialize Google Gemini AI Assistant
       if (typeof GeminiAssistant !== 'undefined') {
         GeminiAssistant.init('assistant-container');
       }
 
-      // 6. Setup dashboard
+      // 7. Setup dashboard
       setupDashboard();
 
-      // 7. Event listeners
+      // 8. Event listeners
       Utils.on('crowdUpdate', updateDashboard);
       Utils.on('phaseChange', updatePhaseTimeline);
       window.addEventListener('hashchange', handleRouteChange);
 
-      // 8. Initial route
+      // 9. Setup Firebase data persistence (save crowd snapshots)
+      setupFirebasePersistence();
+
+      // 10. Initial route
       handleRouteChange();
 
-      // 9. Dismiss splash screen
+      // 11. Dismiss splash screen
       dismissSplash();
 
-      // 10. Register service worker for PWA
+      // 12. Register service worker for PWA
       registerServiceWorker();
 
-      console.log('🏟️ VenueFlow v2.0 initialized successfully');
+      // 13. Log app initialization analytics
+      if (typeof FirebaseService !== 'undefined') {
+        FirebaseService.logEvent('app_initialized', {
+          google_services_count: typeof GoogleCloudServices !== 'undefined' 
+            ? Object.keys(GoogleCloudServices.getServiceStatus()).length : 0,
+          firebase_services: FirebaseService.getActiveServices().join(', '),
+          firebase_mode: FirebaseService.getIsDemoMode() ? 'demo' : 'live'
+        });
+      }
 
-      // 11. Run tests in development (if available)
+      console.log('🏟️ VenueFlow v2.0 initialized successfully');
+      console.log('🌐 Google Cloud Services:', 
+        typeof GoogleCloudServices !== 'undefined' ? GoogleCloudServices.getServiceStatus() : 'N/A');
+      console.log('🔥 Firebase Services:', 
+        typeof FirebaseService !== 'undefined' ? FirebaseService.getActiveServices() : 'N/A');
+
+      // 14. Run tests in development (if available)
       if (typeof TestSuite !== 'undefined') {
-        setTimeout(() => TestSuite.runAll(), 2000);
+        setTimeout(() => TestSuite.runAll(), 2500);
       }
 
     } catch (error) {
       console.error('❌ VenueFlow initialization error:', error);
       handleFatalError(error);
     }
+  }
+
+  /**
+   * Setup Firebase data persistence
+   * Periodically saves crowd snapshots to Firestore
+   * @private
+   */
+  function setupFirebasePersistence() {
+    if (typeof FirebaseService === 'undefined') return;
+
+    // Save crowd snapshot every 30 seconds to Firestore
+    let snapshotCount = 0;
+    Utils.on('crowdUpdate', Utils.throttle((data) => {
+      snapshotCount++;
+      // Save every 10th update (~30 seconds at 3s intervals)
+      if (snapshotCount % 10 === 0) {
+        FirebaseService.saveCrowdSnapshot(data);
+      }
+    }, 5000));
+
+    // Subscribe to real-time crowd updates from other users (Firestore)
+    FirebaseService.onCrowdUpdate((snapshot) => {
+      console.log('📡 Received Firestore crowd update:', snapshot.timestamp);
+    });
+
+    // Save preferences when accessibility settings change
+    const savePrefsDebounced = Utils.debounce(() => {
+      const prefs = {
+        highContrast: document.documentElement.getAttribute('data-high-contrast') === 'true',
+        fontScale: parseFloat(document.documentElement.style.getPropertyValue('--font-scale') || '1'),
+        lastView: currentView
+      };
+      FirebaseService.savePreferences(prefs);
+    }, 2000);
+
+    // Listen for preference changes 
+    const observer = new MutationObserver(savePrefsDebounced);
+    observer.observe(document.documentElement, { 
+      attributes: true, 
+      attributeFilter: ['data-high-contrast', 'style'] 
+    });
   }
 
   /**
@@ -115,6 +203,11 @@ const App = (() => {
       btn.classList.toggle('active', isActive);
       btn.setAttribute('aria-current', isActive ? 'page' : 'false');
     });
+
+    // Log page view to Firebase Analytics
+    if (typeof FirebaseService !== 'undefined') {
+      FirebaseService.logPageView(view);
+    }
 
     // Announce to screen readers
     if (typeof AccessibilityManager !== 'undefined') {

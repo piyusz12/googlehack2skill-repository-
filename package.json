@@ -1,12 +1,28 @@
 {
   "name": "venueflow",
-  "version": "1.0.0",
-  "description": "VenueFlow web application",
+  "version": "2.0.0",
+  "description": "VenueFlow — Smart Venue Experience Platform powered by Google Cloud",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "dependencies": {
     "express": "^4.18.2"
-  }
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "google-cloud",
+    "firebase",
+    "gemini-ai",
+    "google-maps",
+    "venue-management",
+    "crowd-analytics",
+    "pwa",
+    "t20-world-cup"
+  ],
+  "author": "VenueFlow Team",
+  "license": "MIT"
 }

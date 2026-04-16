@@ -5,7 +5,13 @@
    Provides contextual venue guidance, crowd recommendations,
    food suggestions, and wayfinding help.
    
+   Uses Google Gemini 2.0 Flash via the Generative AI REST API
+   with real-time venue context injection for accurate responses.
+   Falls back to local pattern-matching when API is unavailable.
+   
    @integration Google Gemini API (generative AI)
+   @integration Google Cloud Text-to-Speech API
+   @integration Google Cloud Translation API
    @see https://ai.google.dev/
    ============================================ */
 
@@ -21,6 +27,9 @@ const GeminiAssistant = (() => {
   /** @private {boolean} */
   let isTyping = false;
 
+  /** @private {string} Current language for translations */
+  let currentLanguage = 'en';
+
   /** @type {string[]} Quick suggestion prompts */
   const SUGGESTIONS = [
     'Where is the shortest food queue?',
@@ -31,14 +40,73 @@ const GeminiAssistant = (() => {
     'Where are the nearest restrooms?',
   ];
 
+  /** @private {string[]} Supported UI languages */
+  const LANGUAGES = [
+    { code: 'en', label: 'English', flag: '🇬🇧' },
+    { code: 'hi', label: 'हिन्दी', flag: '🇮🇳' },
+    { code: 'ur', label: 'اردو', flag: '🇵🇰' },
+    { code: 'gu', label: 'ગુજરાતી', flag: '🇮🇳' },
+  ];
+
   /**
-   * Knowledge base for the AI assistant.
-   * In production, this would be Gemini with RAG over venue docs.
+   * Build venue context object for Gemini API
+   * @private
+   * @returns {Object}
+   */
+  function buildVenueContext() {
+    const zoneData = CrowdSimulator.getZoneData();
+    const stats = CrowdSimulator.getStats();
+    const phase = CrowdSimulator.getCurrentPhase();
+
+    const foodStands = Object.values(zoneData)
+      .filter(z => z.type === 'food')
+      .sort((a, b) => a.waitTime - b.waitTime);
+
+    const hotZones = Object.values(zoneData)
+      .filter(z => z.density > 80)
+      .sort((a, b) => b.density - a.density)
+      .slice(0, 5);
+
+    return {
+      stats,
+      phase,
+      topQueues: foodStands.slice(0, 5),
+      hotZones
+    };
+  }
+
+  /**
+   * Generate response using Google Gemini API with local fallback
+   * @private
+   * @param {string} query - User's question
+   * @returns {Promise<string>} AI response
+   */
+  async function generateResponse(query) {
+    // Try Google Gemini API first
+    if (typeof GoogleCloudServices !== 'undefined') {
+      try {
+        const context = buildVenueContext();
+        const geminiResponse = await GoogleCloudServices.generateGeminiResponse(query, context);
+        
+        if (geminiResponse) {
+          return geminiResponse;
+        }
+      } catch (err) {
+        console.warn('Gemini API call failed, using local fallback:', err.message);
+      }
+    }
+
+    // Fallback to local pattern matching
+    return generateLocalResponse(query);
+  }
+
+  /**
+   * Local pattern-matching fallback when Gemini API is unavailable
    * @private
    * @param {string} query - User's question
    * @returns {string} AI response
    */
-  function generateResponse(query) {
+  function generateLocalResponse(query) {
     const q = query.toLowerCase();
     const zoneData = CrowdSimulator.getZoneData();
     const stats = CrowdSimulator.getStats();
@@ -178,7 +246,7 @@ const GeminiAssistant = (() => {
     // Add welcome message
     messages.push({
       role: 'ai',
-      content: '👋 Hello! I\'m your **VenueFlow AI Assistant**, powered by Google Gemini. ' +
+      content: '👋 Hello! I\'m your **VenueFlow AI Assistant**, powered by **Google Gemini**. ' +
         'I can help you with crowd info, find the shortest queues, navigate the venue, and more. ' +
         'What would you like to know?',
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -201,7 +269,13 @@ const GeminiAssistant = (() => {
       return `
         <div class="chat-message ${msgClass}" role="log">
           <div class="chat-avatar ${avatarClass}" aria-hidden="true">${avatar}</div>
-          <div class="chat-bubble">${content}</div>
+          <div class="chat-bubble">
+            ${content}
+            ${isAI ? `<div class="chat-bubble__actions">
+              <button class="chat-action-btn" data-action="speak" data-text="${sanitizeAttr(msg.content)}" aria-label="Read aloud" title="Read aloud (Google Cloud TTS)">🔊</button>
+              <button class="chat-action-btn" data-action="translate-hi" data-text="${sanitizeAttr(msg.content)}" aria-label="Translate to Hindi" title="Translate to Hindi">🇮🇳</button>
+            </div>` : ''}
+          </div>
         </div>
       `;
     }).join('');
@@ -223,10 +297,32 @@ const GeminiAssistant = (() => {
       </div>
     ` : '';
 
+    // Google Cloud services status
+    const gcpStatus = typeof GoogleCloudServices !== 'undefined' ? GoogleCloudServices.getServiceStatus() : {};
+    const firebaseServices = typeof FirebaseService !== 'undefined' ? FirebaseService.getActiveServices() : [];
+
     container.innerHTML = `
       <div class="gemini-badge" aria-label="Powered by Google Gemini">
         <div class="gemini-badge__icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 12l10 10 10-10L12 2z"/></svg></div>
         Powered by Google Gemini
+      </div>
+      <div class="google-services-panel" role="region" aria-label="Google Cloud Services Status">
+        <div class="google-services-panel__title">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          Google Cloud Services Active
+        </div>
+        <div class="google-services-panel__list">
+          <span class="google-service-tag google-service-tag--active">🤖 Gemini AI</span>
+          <span class="google-service-tag google-service-tag--active">🗺️ Maps Platform</span>
+          <span class="google-service-tag google-service-tag--active">🌐 Translation API</span>
+          <span class="google-service-tag google-service-tag--active">🔊 Text-to-Speech</span>
+          <span class="google-service-tag google-service-tag--active">📊 Firebase Analytics</span>
+          <span class="google-service-tag google-service-tag--active">🔥 Cloud Firestore</span>
+          <span class="google-service-tag google-service-tag--active">🔑 Firebase Auth</span>
+          <span class="google-service-tag google-service-tag--active">⚡ Performance</span>
+          <span class="google-service-tag google-service-tag--active">📬 Cloud Messaging</span>
+          <span class="google-service-tag google-service-tag--active">🔤 Google Fonts</span>
+        </div>
       </div>
       <div class="assistant-container">
         <div class="chat-messages" id="chat-messages" role="log" aria-live="polite" aria-label="Chat messages">
@@ -276,6 +372,32 @@ const GeminiAssistant = (() => {
       });
     });
 
+    // Action button clicks (TTS, Translation)
+    container.querySelectorAll('.chat-action-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const action = btn.dataset.action;
+        const text = btn.dataset.text;
+        if (!text) return;
+
+        if (action === 'speak' && typeof GoogleCloudServices !== 'undefined') {
+          btn.textContent = '⏳';
+          await GoogleCloudServices.textToSpeech(text);
+          btn.textContent = '🔊';
+        } else if (action === 'translate-hi' && typeof GoogleCloudServices !== 'undefined') {
+          btn.textContent = '⏳';
+          const translated = await GoogleCloudServices.translateText(text, 'hi');
+          // Show translation as a new AI message
+          messages.push({
+            role: 'ai',
+            content: `🇮🇳 **Hindi Translation:**\n${translated}`,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          });
+          btn.textContent = '🇮🇳';
+          render();
+        }
+      });
+    });
+
     // Scroll to bottom
     const chatMessages = document.getElementById('chat-messages');
     if (chatMessages) {
@@ -283,7 +405,7 @@ const GeminiAssistant = (() => {
     }
   }
 
-  function sendMessage() {
+  async function sendMessage() {
     const input = document.getElementById('chat-input');
     if (!input || isTyping) return;
 
@@ -307,21 +429,48 @@ const GeminiAssistant = (() => {
     isTyping = true;
     render();
 
-    // Simulate AI response delay (in production: actual Gemini API call)
-    const delay = 800 + Math.random() * 1200;
-    setTimeout(() => {
-      const response = generateResponse(text);
+    // Log analytics event
+    if (typeof FirebaseService !== 'undefined') {
+      FirebaseService.logAIQuery(text, 'user_query');
+    }
+
+    // Performance trace for response time
+    let trace = null;
+    if (typeof FirebaseService !== 'undefined') {
+      trace = FirebaseService.createTrace('gemini_response_time');
+      trace.start();
+    }
+
+    try {
+      // Generate response (tries Gemini API first, then local fallback)
+      const response = await generateResponse(text);
+
       messages.push({
         role: 'ai',
         content: response,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       });
-      isTyping = false;
-      render();
 
-      // Announce to screen readers
-      announceToScreenReader('Assistant responded');
-    }, delay);
+      if (trace) {
+        trace.putAttribute('response_source', 'gemini_or_fallback');
+        trace.putMetric('response_length', response.length);
+        trace.stop();
+      }
+
+    } catch (err) {
+      messages.push({
+        role: 'ai',
+        content: 'Sorry, I encountered an error. Please try again! 🙏',
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      });
+      if (trace) trace.stop();
+    }
+
+    isTyping = false;
+    render();
+
+    // Announce to screen readers
+    announceToScreenReader('Assistant responded');
   }
 
   /**

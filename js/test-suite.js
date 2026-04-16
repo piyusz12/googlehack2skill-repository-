@@ -5,7 +5,8 @@
    components. Run via console: TestSuite.runAll()
    
    Tests cover: rendering, simulation, accessibility,
-   security, performance, and user interactions.
+   security, performance, Google Cloud services, and
+   user interactions.
    ============================================ */
 
 const TestSuite = (() => {
@@ -174,6 +175,9 @@ const TestSuite = (() => {
     // Nav landmark
     assertTruthy(document.querySelector('nav'), 'Nav landmark exists');
 
+    // Noscript fallback
+    assertTruthy(document.querySelector('noscript'), 'Noscript fallback exists');
+
     // No images without alt text
     const images = document.querySelectorAll('img');
     let allHaveAlt = true;
@@ -190,6 +194,14 @@ const TestSuite = (() => {
     // CSP meta tag
     const cspMeta = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
     assertTruthy(cspMeta, 'Content Security Policy meta tag exists');
+
+    // CSP includes Google Cloud domains
+    if (cspMeta) {
+      const cspContent = cspMeta.getAttribute('content') || '';
+      assert(cspContent.includes('googleapis.com'), 'CSP allows googleapis.com');
+      assert(cspContent.includes('firebaseio.com'), 'CSP allows firebaseio.com');
+      assert(cspContent.includes('gstatic.com'), 'CSP allows gstatic.com');
+    }
 
     // Inputs have maxlength
     const chatInput = document.getElementById('chat-input');
@@ -251,7 +263,7 @@ const TestSuite = (() => {
 
     // No memory leaks from event listeners (basic check)
     const scripts = document.querySelectorAll('script');
-    assert(scripts.length <= 15, `Script count: ${scripts.length} (reasonable)`);
+    assert(scripts.length <= 20, `Script count: ${scripts.length} (reasonable)`);
 
     // CSS files
     const stylesheets = document.querySelectorAll('link[rel="stylesheet"]');
@@ -259,6 +271,93 @@ const TestSuite = (() => {
 
     // Page load should be fast (check if DOMContentLoaded already fired)
     assert(document.readyState === 'complete' || document.readyState === 'interactive', 'Page is loaded');
+  }
+
+  /** Test Google Cloud Services integration */
+  function testGoogleServices() {
+    console.log('%c☁️ Testing Google Cloud Services...', 'color: #4285F4; font-weight: bold');
+
+    // Firebase SDK loaded
+    assertTruthy(typeof firebase !== 'undefined' || typeof FirebaseService !== 'undefined', 
+      'Firebase SDK or FirebaseService module loaded');
+
+    // FirebaseService module exists
+    assertTruthy(typeof FirebaseService !== 'undefined', 'FirebaseService module exists');
+
+    if (typeof FirebaseService !== 'undefined') {
+      // Firebase initialized
+      assertTruthy(FirebaseService.getIsInitialized(), 'Firebase is initialized');
+
+      // Firebase user exists (anonymous auth)
+      assertTruthy(FirebaseService.getUserId(), 'Firebase Auth: User ID exists');
+
+      // Active services
+      const services = FirebaseService.getActiveServices();
+      assert(services.length >= 4, `Firebase active services: ${services.length} (≥ 4 expected)`);
+      assert(services.includes('Cloud Firestore'), 'Cloud Firestore is active');
+      assert(services.includes('Authentication'), 'Firebase Authentication is active');
+      assert(services.includes('Analytics'), 'Firebase Analytics is active');
+      assert(services.includes('Performance Monitoring'), 'Firebase Performance Monitoring is active');
+
+      // Firestore write test
+      assertTruthy(typeof FirebaseService.saveCrowdSnapshot === 'function', 'Firestore write function exists');
+      assertTruthy(typeof FirebaseService.saveOrder === 'function', 'Firestore order function exists');
+      assertTruthy(typeof FirebaseService.savePreferences === 'function', 'Firestore preferences function exists');
+
+      // Analytics event function
+      assertTruthy(typeof FirebaseService.logEvent === 'function', 'Analytics logEvent function exists');
+      assertTruthy(typeof FirebaseService.logPageView === 'function', 'Analytics logPageView function exists');
+      assertTruthy(typeof FirebaseService.logFoodOrder === 'function', 'Analytics logFoodOrder function exists');
+
+      // Performance trace function
+      assertTruthy(typeof FirebaseService.createTrace === 'function', 'Performance createTrace function exists');
+    }
+
+    // GoogleCloudServices module exists
+    assertTruthy(typeof GoogleCloudServices !== 'undefined', 'GoogleCloudServices module exists');
+
+    if (typeof GoogleCloudServices !== 'undefined') {
+      // Service status check
+      const status = GoogleCloudServices.getServiceStatus();
+      assertTruthy(status.gemini, 'Gemini AI service status exists');
+      assertTruthy(status.translate, 'Translation service status exists');
+      assertTruthy(status.tts, 'Text-to-Speech service status exists');
+      assertTruthy(status.maps, 'Maps service status exists');
+      assertTruthy(status.apiKey?.configured, 'Google API key is configured');
+
+      // API functions exist
+      assertTruthy(typeof GoogleCloudServices.translateText === 'function', 'Translation API function exists');
+      assertTruthy(typeof GoogleCloudServices.textToSpeech === 'function', 'Text-to-Speech API function exists');
+      assertTruthy(typeof GoogleCloudServices.generateGeminiResponse === 'function', 'Gemini API function exists');
+      assertTruthy(typeof GoogleCloudServices.getDirections === 'function', 'Maps Directions function exists');
+      assertTruthy(typeof GoogleCloudServices.getStaticMapUrl === 'function', 'Static Map function exists');
+    }
+
+    // Google Maps embed present
+    const mapsIframe = document.querySelector('iframe.maps-embed');
+    assertTruthy(mapsIframe, 'Google Maps embed iframe exists');
+    if (mapsIframe) {
+      const src = mapsIframe.getAttribute('src') || '';
+      assert(src.includes('maps.google.com'), 'Google Maps iframe has correct source');
+    }
+
+    // Google Fonts loaded
+    const fontsLink = document.querySelector('link[href*="fonts.googleapis.com"]');
+    assertTruthy(fontsLink, 'Google Fonts stylesheet loaded');
+
+    // Google Analytics tag
+    const gaScript = document.querySelector('script[src*="googletagmanager.com"]');
+    assertTruthy(gaScript, 'Google Analytics tag present');
+
+    // Firebase SDK scripts loaded
+    const firebaseScript = document.querySelector('script[src*="firebase"]');
+    assertTruthy(firebaseScript, 'Firebase SDK script tag present');
+
+    // Gemini assistant badge
+    const geminiBadge = document.querySelector('.gemini-badge');
+    if (geminiBadge) {
+      assertTruthy(geminiBadge.textContent.includes('Gemini'), 'Gemini badge displays correctly');
+    }
   }
 
   /**
@@ -279,6 +378,7 @@ const TestSuite = (() => {
     testSecurity();
     testUtilities();
     testPerformance();
+    testGoogleServices();
 
     // Summary
     console.log('\n%c' + '='.repeat(50), 'color: #5a6484');
