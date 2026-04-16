@@ -1,6 +1,11 @@
 runtime: python39
 
 handlers:
+  # Route the root path to index.html
+  - url: /
+    static_files: index.html
+    upload: index.html
+
   # Serve static CSS files
   - url: /css
     static_dir: css
@@ -15,7 +20,7 @@ handlers:
     static_files: \1
     upload: (.*\..+)$
 
-  # Catch-all handler to serve index.html for root and any SPA routes
+  # Catch-all handler to serve index.html for any SPA routes
   - url: /.*
     static_files: index.html
     upload: index.html
