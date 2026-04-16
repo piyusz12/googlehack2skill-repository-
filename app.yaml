@@ -9,22 +9,13 @@ handlers:
   - url: /js
     static_dir: js
 
-  # Serve the service worker at root
-  - url: /sw.js
-    static_files: sw.js
-    upload: sw\.js
-
-  # Serve the PWA manifest
-  - url: /manifest.json
-    static_files: manifest.json
-    upload: manifest\.json
-
-  # Serve the root index.html
-  - url: /
-    static_files: index.html
-    upload: index\.html
-
-  # Catch-all for any other static files at root
-  - url: /(.*)
+  # Serve all other static files that have an extension
+  # This handles sw.js, manifest.json, images, etc.
+  - url: /(.*\..+)$
     static_files: \1
-    upload: (.*)
+    upload: (.*\..+)$
+
+  # Catch-all handler to serve index.html for root and any SPA routes
+  - url: /.*
+    static_files: index.html
+    upload: index.html
