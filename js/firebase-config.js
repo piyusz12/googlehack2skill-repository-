@@ -21,7 +21,7 @@ const FirebaseService = (() => {
    * @type {Object}
    */
   const FIREBASE_CONFIG = {
-    apiKey: "AIzaSyB_Xj6E3t-nPNv48RphhvW4BaUtjxWSXZo",
+    apiKey: "YOUR_FIREBASE_API_KEY_HERE",
     authDomain: "venueflow-t20.firebaseapp.com",
     projectId: "venueflow-t20",
     storageBucket: "venueflow-t20.firebasestorage.app",

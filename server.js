@@ -129,7 +129,7 @@ app.post('/api/translate', async (req, res) => {
   }
 
   try {
-    const apiKey = process.env.GOOGLE_API_KEY || 'AIzaSyB_Xj6E3t-nPNv48RphhvW4BaUtjxWSXZo';
+    const apiKey = process.env.GOOGLE_API_KEY || 'YOUR_GOOGLE_API_KEY_HERE';
     const response = await fetch(
       `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`,
       {
@@ -160,7 +160,7 @@ app.post('/api/tts', async (req, res) => {
   }
 
   try {
-    const apiKey = process.env.GOOGLE_API_KEY || 'AIzaSyB_Xj6E3t-nPNv48RphhvW4BaUtjxWSXZo';
+    const apiKey = process.env.GOOGLE_API_KEY || 'YOUR_GOOGLE_API_KEY_HERE';
     const response = await fetch(
       `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`,
       {
@@ -194,7 +194,7 @@ app.post('/api/gemini', async (req, res) => {
   }
 
   try {
-    const apiKey = process.env.GOOGLE_API_KEY || 'AIzaSyB_Xj6E3t-nPNv48RphhvW4BaUtjxWSXZo';
+    const apiKey = process.env.GOOGLE_API_KEY || 'YOUR_GOOGLE_API_KEY_HERE';
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-04-17:generateContent?key=${apiKey}`,
       {

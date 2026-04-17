@@ -16,7 +16,7 @@ env_variables:
   NODE_ENV: "production"
   GOOGLE_CLOUD_PROJECT: "venueflow-t20"
   GOOGLE_CLOUD_REGION: "asia-south1"
-  GOOGLE_API_KEY: "AIzaSyB_Xj6E3t-nPNv48RphhvW4BaUtjxWSXZo"
+  GOOGLE_API_KEY: "YOUR_GOOGLE_API_KEY_HERE"
 
 handlers:
   # Health check endpoint

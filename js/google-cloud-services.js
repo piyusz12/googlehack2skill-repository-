@@ -18,7 +18,7 @@ const GoogleCloudServices = (() => {
    * Google Cloud API key for client-side services
    * @see https://console.cloud.google.com/apis/credentials
    */
-  const API_KEY = 'AIzaSyB_Xj6E3t-nPNv48RphhvW4BaUtjxWSXZo';
+  const API_KEY = 'YOUR_GOOGLE_API_KEY_HERE';
 
   /**
    * API endpoints for Google Cloud services
