@@ -85,7 +85,7 @@ app.get('/healthz', (req, res) => {
     timestamp: new Date().toISOString(),
     googleCloud: {
       project: process.env.GOOGLE_CLOUD_PROJECT || 'venueflow-t20',
-      region: process.env.GOOGLE_CLOUD_REGION || 'asia-south1',
+      region: process.env.GOOGLE_CLOUD_REGION || 'europe-west1',
       runtime: 'nodejs20'
     }
   });

@@ -162,7 +162,7 @@ VenueFlow deeply integrates **12 Google Cloud and Firebase services**:
 |------|---------|
 | `app.yaml` | App Engine config: `nodejs20` runtime, auto-scaling (0-10 instances), environment variables for API keys |
 | `Dockerfile` | Cloud Run container: multi-stage build, health checks, port 8080 |
-| `cloudbuild.yaml` | Cloud Build CI/CD: build → push to GCR → deploy to Cloud Run (asia-south1) |
+| `cloudbuild.yaml` | Cloud Build CI/CD: build → push to GCR → deploy to Cloud Run (europe-west1) |
 | `.gcloudignore` | Excludes `.git`, `node_modules`, tests from deployment |
 
 ---

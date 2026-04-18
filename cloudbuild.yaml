@@ -35,7 +35,7 @@ steps:
       - 'deploy'
       - 'venueflow'
       - '--image=gcr.io/$PROJECT_ID/venueflow:$COMMIT_SHA'
-      - '--region=asia-south1'
+      - '--region=europe-west1'
       - '--platform=managed'
       - '--allow-unauthenticated'
       - '--memory=512Mi'
