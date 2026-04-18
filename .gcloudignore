@@ -8,7 +8,7 @@ node_modules/
 __pycache__/
 *.pyc
 tests/
-Dockerfile
+# Dockerfile removed from ignore list to allow Cloud Run builds
 docker-compose.yml
 .env
 .DS_Store
