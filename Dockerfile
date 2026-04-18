@@ -22,7 +22,7 @@ COPY . .
 # Set environment variables for Google Cloud
 ENV NODE_ENV=production
 ENV PORT=8080
-ENV GOOGLE_CLOUD_PROJECT=venueflow-t20
+ENV GOOGLE_CLOUD_PROJECT=hack2skill-493718
 ENV GOOGLE_CLOUD_REGION=europe-west1
 
 # Expose port

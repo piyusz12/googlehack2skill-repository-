@@ -84,7 +84,7 @@ app.get('/healthz', (req, res) => {
     version: '2.0.0',
     timestamp: new Date().toISOString(),
     googleCloud: {
-      project: process.env.GOOGLE_CLOUD_PROJECT || 'venueflow-t20',
+      project: process.env.GOOGLE_CLOUD_PROJECT || 'hack2skill-493718',
       region: process.env.GOOGLE_CLOUD_REGION || 'europe-west1',
       runtime: 'nodejs20'
     }
@@ -244,6 +244,6 @@ app.listen(port, () => {
     port,
     nodeVersion: process.version,
     environment: process.env.NODE_ENV || 'development',
-    googleCloudProject: process.env.GOOGLE_CLOUD_PROJECT || 'venueflow-t20'
+    googleCloudProject: process.env.GOOGLE_CLOUD_PROJECT || 'hack2skill-493718'
   }));
 });

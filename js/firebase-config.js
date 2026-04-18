@@ -22,9 +22,9 @@ const FirebaseService = (() => {
    */
   const FIREBASE_CONFIG = {
     apiKey: "YOUR_FIREBASE_API_KEY_HERE",
-    authDomain: "venueflow-t20.firebaseapp.com",
-    projectId: "venueflow-t20",
-    storageBucket: "venueflow-t20.firebasestorage.app",
+    authDomain: "hack2skill-493718.firebaseapp.com",
+    projectId: "hack2skill-493718",
+    storageBucket: "hack2skill-493718.firebasestorage.app",
     messagingSenderId: "948372615203",
     appId: "1:948372615203:web:a3f7c8d2e4b5a6c1d0e9f8",
     measurementId: "G-VF2026T20WC"

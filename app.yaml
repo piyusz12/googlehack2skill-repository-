@@ -14,7 +14,7 @@ automatic_scaling:
 
 env_variables:
   NODE_ENV: "production"
-  GOOGLE_CLOUD_PROJECT: "venueflow-t20"
+  GOOGLE_CLOUD_PROJECT: "hack2skill-493718"
   GOOGLE_CLOUD_REGION: "europe-west1"
   GOOGLE_API_KEY: "YOUR_GOOGLE_API_KEY_HERE"
 
