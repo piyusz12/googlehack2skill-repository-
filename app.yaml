@@ -2,7 +2,6 @@
 # @see https://cloud.google.com/appengine/docs/standard/nodejs/config/appref
 
 runtime: nodejs20
-service: vflow
 
 instance_class: F2
 
