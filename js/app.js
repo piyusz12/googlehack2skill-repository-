@@ -1,6 +1,7 @@
 /* ============================================
    VenueFlow — Main App Controller
    ============================================
+   @module App
    @description Controls view routing, component lifecycle,
    global state management, and Google Cloud services integration.
    

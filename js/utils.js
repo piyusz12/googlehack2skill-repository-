@@ -1,9 +1,11 @@
 /* ============================================
    VenueFlow — Shared Utilities
    ============================================
+   @module Utils
    @description Core utility functions for DOM manipulation,
    event management, formatting, and security helpers.
-   @version 2.0.0
+   @version 2.1.0
+   @author VenueFlow Team
    ============================================ */
 
 const Utils = (() => {

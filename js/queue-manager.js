@@ -1,11 +1,38 @@
 /* ============================================
    VenueFlow — Smart Queue Manager
+   ============================================
+   @module QueueManager
+   @description Real-time queue wait time display for food stands,
+   restrooms, and merchandise areas. Provides smart AI-like
+   recommendations by comparing wait times across facilities.
+
+   @version 2.1.0
+   @author VenueFlow Team
    ============================================ */
 
 const QueueManager = (() => {
+  'use strict';
+
+  // ---------- Constants ----------
+
+  /** @const {number} Minimum savings (minutes) to show a recommendation */
+  const MIN_SAVINGS_MINUTES = 3;
+
+  /** @const {number} Maximum wait time for progress bar scaling (minutes) */
+  const MAX_WAIT_SCALE = 20;
+
+  // ---------- State ----------
+
+  /** @private {HTMLElement|null} */
   let container = null;
+
+  /** @private {string} Currently active tab filter */
   let currentTab = 'all';
 
+  /**
+   * Initialize the queue manager.
+   * @param {string} containerId - DOM container element ID
+   */
   function init(containerId) {
     container = document.getElementById(containerId);
     if (!container) return;
@@ -14,6 +41,10 @@ const QueueManager = (() => {
     Utils.on('crowdUpdate', update);
   }
 
+  /**
+   * Render the tab bar and initial queue list.
+   * @private
+   */
   function render() {
     if (!container) return;
     container.innerHTML = `
@@ -41,6 +72,11 @@ const QueueManager = (() => {
     });
   }
 
+  /**
+   * Update the queue list with latest crowd data.
+   * Sorts facilities by wait time and renders progress bars.
+   * @private
+   */
   function update() {
     const listEl = document.getElementById('queue-list');
     if (!listEl) return;
@@ -61,7 +97,7 @@ const QueueManager = (() => {
       const level = Utils.getWaitColor(f.waitTime);
       const trend = Utils.getTrendIcon(f.trend);
       const icon = { food: '🍔', restroom: '🚻', merchandise: '🛍️' }[f.type] || '📍';
-      const fillPercent = Math.min(100, (f.waitTime / 20) * 100);
+      const fillPercent = Math.min(100, (f.waitTime / MAX_WAIT_SCALE) * 100);
 
       return `
         <div class="list-item" data-zone-id="${f.id}">
@@ -85,6 +121,12 @@ const QueueManager = (() => {
     }).join('');
   }
 
+  /**
+   * Update the smart recommendation banner.
+   * Shows time savings when difference exceeds MIN_SAVINGS_MINUTES.
+   * @param {Array<Object>} facilities - Sorted facility data
+   * @private
+   */
   function updateRecommendation(facilities) {
     const recEl = document.getElementById('queue-recommendation');
     const recText = document.getElementById('queue-rec-text');
@@ -101,7 +143,7 @@ const QueueManager = (() => {
     const longest = sorted[sorted.length - 1];
     const savings = longest.waitTime - shortest.waitTime;
 
-    if (savings > 3) {
+    if (savings > MIN_SAVINGS_MINUTES) {
       recEl.style.display = 'flex';
       recText.textContent = `Save ~${savings} min! ${shortest.name} has ${shortest.waitTime} min wait vs ${longest.waitTime} min at ${longest.name}`;
     } else {

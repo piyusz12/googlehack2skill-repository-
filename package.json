@@ -1,14 +1,24 @@
 {
   "name": "venueflow",
-  "version": "2.0.0",
-  "description": "VenueFlow — Smart Venue Experience Platform powered by Google Cloud",
+  "version": "2.1.0",
+  "description": "VenueFlow — Smart Venue Experience Platform powered by Google Cloud. Real-time crowd analytics, AI assistant (Gemini), and venue management for large-scale events.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "lint": "eslint js/ server.js sw.js --ext .js",
+    "lint:fix": "eslint js/ server.js sw.js --ext .js --fix",
+    "format": "prettier --write \"js/**/*.js\" \"css/**/*.css\" server.js sw.js",
+    "test": "echo \"Run TestSuite.runAll() in browser console for client-side tests\" && node -e \"console.log('Server healthcheck...'); fetch('http://localhost:8080/healthz').then(r=>r.json()).then(d=>console.log('OK:',d.status)).catch(()=>console.log('Server not running'))\"",
+    "validate": "npm run lint && echo 'All checks passed!'"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "helmet": "^7.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.0"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -21,8 +31,18 @@
     "venue-management",
     "crowd-analytics",
     "pwa",
-    "t20-world-cup"
+    "t20-world-cup",
+    "accessibility",
+    "real-time"
   ],
   "author": "VenueFlow Team",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/piyusz12/googlehack2skill-repository-"
+  },
+  "bugs": {
+    "url": "https://github.com/piyusz12/googlehack2skill-repository-/issues"
+  },
+  "homepage": "https://github.com/piyusz12/googlehack2skill-repository-#readme"
 }

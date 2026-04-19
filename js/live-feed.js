@@ -1,32 +1,77 @@
 /* ============================================
    VenueFlow — Live Event Feed & Scoreboard
+   ============================================
+   @module LiveFeed
+   @description Real-time match feed and scoreboard for the
+   ICC T20 World Cup 2026 India vs Pakistan match. Simulates
+   ball-by-ball updates with boundaries, wickets, DRS reviews,
+   and milestones. Features a draggable floating scoreboard
+   widget with CRR/RRR calculations.
+
+   @version 2.1.0
+   @author VenueFlow Team
    ============================================ */
 
 const LiveFeed = (() => {
+  'use strict';
+
+  // ---------- Constants ----------
+
+  /** @const {number} Maximum number of feed items to display */
+  const MAX_FEED_ITEMS = 20;
+
+  /** @const {number} Feed event generation interval in milliseconds */
+  const FEED_INTERVAL_MS = 6000;
+
+  /** @const {number} T20 format: maximum overs per innings */
+  const T20_MAX_OVERS = 20;
+
+  /** @const {number} Balls per over in cricket */
+  const BALLS_PER_OVER = 6;
+
+  /** @const {number} Total balls in a T20 innings */
+  const TOTAL_BALLS_PER_INNINGS = T20_MAX_OVERS * BALLS_PER_OVER;
+
+  /** @const {number} Powerplay ends after this many overs */
+  const POWERPLAY_OVERS = 6;
+
+  // ---------- State ----------
+
+  /** @private {HTMLElement|null} */
   let container = null;
+  /** @private {Array<Object>} Feed event items */
   let feedItems = [];
+
+  /** @private {number} India batting stats */
   let homeRuns = 0;
-  let homeWickets = 0;
-  let homeOvers = 0;
-  let homeBalls = 0;
+  /** @private {number} */ let homeWickets = 0;
+  /** @private {number} */ let homeOvers = 0;
+  /** @private {number} */ let homeBalls = 0;
 
+  /** @private {number} Pakistan batting stats */
   let awayRuns = 0;
-  let awayWickets = 0;
-  let awayOvers = 0;
-  let awayBalls = 0;
+  /** @private {number} */ let awayWickets = 0;
+  /** @private {number} */ let awayOvers = 0;
+  /** @private {number} */ let awayBalls = 0;
 
+  /** @private {string} Current on-strike batter */
   let currentStriker = '';
+  /** @private {string} Non-strike batter */
   let currentNonStriker = '';
+  /** @private {string} Current bowler */
   let currentBowler = '';
 
+  /** @private {number|null} Feed generation interval handle */
   let feedInterval = null;
+  /** @private {number|null} Target score for 2nd innings chase */
   let matchTarget = null;
+  /** @private {boolean} Whether the match has concluded */
   let isMatchOver = false;
-  
-  // Drag state
-  let isDragging = false;
-  let offsetX = 0;
-  let offsetY = 0;
+
+  // Drag state for floating scoreboard
+  /** @private {boolean} */ let isDragging = false;
+  /** @private {number} */ let offsetX = 0;
+  /** @private {number} */ let offsetY = 0;
 
   const TEAMS = {
     home: { name: 'India', short: 'IND', color: '#0000FF', emoji: '🇮🇳' },
@@ -94,6 +139,10 @@ const LiveFeed = (() => {
     ],
   };
 
+  /**
+   * Initialize the live feed and scoreboard.
+   * @param {string} containerId - DOM container element ID
+   */
   function init(containerId) {
     container = document.getElementById(containerId);
     if (!container) return;
@@ -157,6 +206,10 @@ const LiveFeed = (() => {
     }
   }
 
+  /**
+   * Render the full scoreboard and feed UI.
+   * @private
+   */
   function render() {
     if (!container) return;
 
@@ -224,16 +277,22 @@ const LiveFeed = (() => {
     `;
   }
 
+  /**
+   * Advance the ball count by one delivery.
+   * Handles over completion and strike rotation.
+   * @param {boolean} isHomeBatting - Whether the home team is batting
+   * @private
+   */
   function advanceBall(isHomeBatting) {
     const o = isHomeBatting ? homeOvers : awayOvers;
     const b = isHomeBatting ? homeBalls : awayBalls;
     
     // Hard stop at 20 overs
-    if (o >= 20) return;
+    if (o >= T20_MAX_OVERS) return;
 
     if (isHomeBatting) {
       homeBalls++;
-      if (homeBalls >= 6) {
+      if (homeBalls >= BALLS_PER_OVER) {
         homeOvers++;
         homeBalls = 0;
         const bowlerPool = PLAYERS.away.slice(5, 11);
@@ -244,7 +303,7 @@ const LiveFeed = (() => {
       }
     } else {
       awayBalls++;
-      if (awayBalls >= 6) {
+      if (awayBalls >= BALLS_PER_OVER) {
         awayOvers++;
         awayBalls = 0;
         const bowlerPool = PLAYERS.home.slice(5, 11);
@@ -256,6 +315,10 @@ const LiveFeed = (() => {
     }
   }
 
+  /**
+   * Start the live feed event generation loop.
+   * @private
+   */
   function startFeed() {
     // Generate initial items
     addFeedItem({ title: '🏟️ Welcome!', desc: 'Welcome to the stadium! VenueFlow is tracking live conditions for you.', type: 'info' });
@@ -263,7 +326,7 @@ const LiveFeed = (() => {
     // Add events periodically
     feedInterval = setInterval(() => {
       generateRandomEvent();
-    }, 6000);
+    }, FEED_INTERVAL_MS);
 
     // Update scoreboard with crowd data
     Utils.on('crowdUpdate', (data) => {
@@ -274,6 +337,11 @@ const LiveFeed = (() => {
     });
   }
 
+  /**
+   * Generate a random match event (boundary, wicket, or singles).
+   * Respects T20 rules: max 20 overs, 10 wickets, powerplay probabilities.
+   * @private
+   */
   function generateRandomEvent() {
     if (isMatchOver) return;
     
@@ -298,7 +366,7 @@ const LiveFeed = (() => {
     const matchMin = CrowdSimulator.getMatchMinute();
 
     // End of 1st Inning check
-    if (isHomeBatting && (homeOvers >= 20 || homeWickets >= 10)) {
+    if (isHomeBatting && (homeOvers >= T20_MAX_OVERS || homeWickets >= 10)) {
       return; 
     }
     
@@ -309,7 +377,7 @@ const LiveFeed = (() => {
         addFeedItem({ title: '🏆 PAKISTAN WINS!', desc: `${TEAMS.away.name} chased down the target with ${10 - awayWickets} wickets in hand!`, type: 'info' });
         return;
       }
-      if (awayOvers >= 20 || awayWickets >= 10) {
+      if (awayOvers >= T20_MAX_OVERS || awayWickets >= 10) {
         isMatchOver = true;
         addFeedItem({ title: '🏆 INDIA WINS!', desc: `${TEAMS.home.name} defended ${matchTarget-1}! ${TEAMS.away.name} falls short.`, type: 'info' });
         return;
@@ -320,8 +388,8 @@ const LiveFeed = (() => {
     if (!currentBowler) currentBowler = (isHomeBatting ? PLAYERS.away[10] : PLAYERS.home[10]).name;
     if (!currentNonStriker) currentNonStriker = (isHomeBatting ? PLAYERS.home[1] : PLAYERS.away[1]).name;
 
-    const currentOversFloat = isHomeBatting ? (homeOvers + homeBalls/6) : (awayOvers + awayBalls/6);
-    const isPowerplay = currentOversFloat < 6;
+    const currentOversFloat = isHomeBatting ? (homeOvers + homeBalls / BALLS_PER_OVER) : (awayOvers + awayBalls / BALLS_PER_OVER);
+    const isPowerplay = currentOversFloat < POWERPLAY_OVERS;
 
     advanceBall(isHomeBatting);
     const roll = Math.random();
@@ -365,6 +433,12 @@ const LiveFeed = (() => {
     updateScoreboard();
   }
 
+  /**
+   * Add an event item to the live feed.
+   * Keeps the feed capped at MAX_FEED_ITEMS entries.
+   * @param {Object} item - Feed item with title, desc, and type
+   * @private
+   */
   function addFeedItem(item) {
     const now = new Date();
     const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -382,10 +456,14 @@ const LiveFeed = (() => {
       id: Date.now(),
     });
 
-    if (feedItems.length > 20) feedItems = feedItems.slice(0, 20);
+    if (feedItems.length > MAX_FEED_ITEMS) feedItems = feedItems.slice(0, MAX_FEED_ITEMS);
     renderFeedList();
   }
 
+  /**
+   * Render the feed event list to the DOM.
+   * @private
+   */
   function renderFeedList() {
     const listEl = document.getElementById('feed-list');
     if (!listEl) return;
@@ -418,6 +496,11 @@ const LiveFeed = (() => {
     }).join('');
   }
 
+  /**
+   * Update the main scoreboard and floating widget with latest scores.
+   * Calculates CRR (current run rate) and RRR (required run rate).
+   * @private
+   */
   function updateScoreboard() {
     const homeEl = document.getElementById('home-score');
     const awayEl = document.getElementById('away-score');
@@ -449,15 +532,15 @@ const LiveFeed = (() => {
       const o = isHomeBatting ? homeOvers : awayOvers;
       const b = isHomeBatting ? homeBalls : awayBalls;
 
-      const currentOversFloat = isHomeBatting ? (homeOvers + homeBalls/6) : (awayOvers + awayBalls/6);
+      const currentOversFloat = isHomeBatting ? (homeOvers + homeBalls / BALLS_PER_OVER) : (awayOvers + awayBalls / BALLS_PER_OVER);
       const crr = currentOversFloat > 0 ? (r / currentOversFloat).toFixed(2) : '0.00';
-      const isPowerplay = currentOversFloat < 6 && currentPhase.id !== 'halftime';
+      const isPowerplay = currentOversFloat < POWERPLAY_OVERS && currentPhase.id !== 'halftime';
       
       let rrrDisplay = '';
       if (!isHomeBatting && matchTarget !== null && !isMatchOver) {
-        const remainingBalls = 120 - (awayOvers * 6 + awayBalls);
+        const remainingBalls = TOTAL_BALLS_PER_INNINGS - (awayOvers * BALLS_PER_OVER + awayBalls);
         if (remainingBalls > 0) {
-           rrrDisplay = `<span><strong>RRR:</strong> ${((matchTarget - awayRuns) / (remainingBalls / 6)).toFixed(2)}</span>`;
+           rrrDisplay = `<span><strong>RRR:</strong> ${((matchTarget - awayRuns) / (remainingBalls / BALLS_PER_OVER)).toFixed(2)}</span>`;
         }
       }
 

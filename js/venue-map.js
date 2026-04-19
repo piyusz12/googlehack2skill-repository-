@@ -1,13 +1,36 @@
 /* ============================================
    VenueFlow — Interactive SVG Venue Map
+   ============================================
+   @module VenueMap
+   @description Interactive SVG heatmap of the Narendra Modi Stadium.
+   Renders all 50+ zones with density-based color coding, hover
+   tooltips, click selection, and a real-time legend/phase indicator.
+
+   @version 2.1.0
+   @author VenueFlow Team
    ============================================ */
 
 const VenueMap = (() => {
+  'use strict';
+
+  // ---------- State ----------
+
+  /** @private {SVGElement|null} */
   let svgEl = null;
+
+  /** @private {HTMLElement|null} */
   let tooltipEl = null;
+
+  /** @private {string|null} Currently selected zone ID */
   let selectedZone = null;
+
+  /** @private {HTMLElement|null} */
   let mapContainer = null;
 
+  /**
+   * Initialize the venue map.
+   * @param {string} containerId - DOM container element ID
+   */
   function init(containerId) {
     mapContainer = document.getElementById(containerId);
     if (!mapContainer) return;
@@ -53,6 +76,10 @@ const VenueMap = (() => {
     Utils.on('crowdUpdate', updateHeatmap);
   }
 
+  /**
+   * Draw the full stadium SVG including field, pitch, and all zones.
+   * @private
+   */
   function drawStadium() {
     if (!svgEl) return;
 
@@ -120,6 +147,11 @@ const VenueMap = (() => {
     zones.forEach(zone => drawZone(zone));
   }
 
+  /**
+   * Draw a single zone shape on the SVG map.
+   * @param {Object} zone - Zone definition with id, type, x, y, capacity
+   * @private
+   */
   function drawZone(zone) {
     let shape;
     const group = createSVGElement('g', {
@@ -204,6 +236,12 @@ const VenueMap = (() => {
     svgEl.appendChild(group);
   }
 
+  /**
+   * Handle zone click — select zone and emit event.
+   * @param {Object} zone - Zone definition
+   * @param {Event} e - Click event
+   * @private
+   */
   function handleZoneClick(zone, e) {
     // Deselect previous
     if (selectedZone) {
@@ -218,6 +256,12 @@ const VenueMap = (() => {
     Utils.emit('zoneSelected', zone);
   }
 
+  /**
+   * Show tooltip with zone details near the cursor.
+   * @param {Object} zone - Zone definition
+   * @param {MouseEvent} e - Mouse event
+   * @private
+   */
   function showTooltip(zone, e) {
     if (!tooltipEl) return;
     const data = CrowdSimulator.getZoneData()[zone.id];
@@ -256,10 +300,19 @@ const VenueMap = (() => {
     tooltipEl.classList.add('visible');
   }
 
+  /**
+   * Hide the zone tooltip.
+   * @private
+   */
   function hideTooltip() {
     if (tooltipEl) tooltipEl.classList.remove('visible');
   }
 
+  /**
+   * Update zone heatmap colors based on latest crowd data.
+   * @param {Object} data - Crowd update data with zones map
+   * @private
+   */
   function updateHeatmap(data) {
     if (!svgEl) return;
 
@@ -287,6 +340,13 @@ const VenueMap = (() => {
     }
   }
 
+  /**
+   * Create an SVG element with attributes.
+   * @param {string} tag - SVG tag name
+   * @param {Object} attrs - Attribute key-value pairs
+   * @returns {SVGElement}
+   * @private
+   */
   function createSVGElement(tag, attrs = {}) {
     const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
     Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));

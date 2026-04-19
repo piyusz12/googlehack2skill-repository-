@@ -1,12 +1,15 @@
 /* ============================================
    VenueFlow — Google Cloud Services Integration
    ============================================
+   @module GoogleCloudServices
    @description Unified module for Google Cloud Platform services:
    - Google Cloud Translation API (multilingual venue alerts)
    - Google Cloud Text-to-Speech API (accessibility TTS)
    - Google Maps Platform (directions, geocoding)
    - Google Gemini AI 2.5 Flash (generative AI for venue assistant)
    
+   @version 2.1.0
+   @author VenueFlow Team
    @see https://cloud.google.com/apis
    @integration Uses REST APIs with Google API key
    ============================================ */

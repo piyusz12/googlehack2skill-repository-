@@ -9,7 +9,7 @@
    @integration Firebase Cloud Messaging (push notifications)
    ============================================ */
 
-const CACHE_NAME = 'venueflow-v4.0.0';
+const CACHE_NAME = 'venueflow-v4.2.0';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -29,6 +29,7 @@ const STATIC_ASSETS = [
   './js/live-feed.js',
   './js/gemini-assistant.js',
   './js/accessibility.js',
+  './js/test-suite.js',
   './js/app.js',
   './manifest.json',
 ];

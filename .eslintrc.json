@@ -1,0 +1,63 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "serviceworker": true,
+    "node": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "script"
+  },
+  "globals": {
+    "Utils": "readonly",
+    "CrowdSimulator": "readonly",
+    "VenueMap": "readonly",
+    "QueueManager": "readonly",
+    "Navigation": "readonly",
+    "PreOrder": "readonly",
+    "LiveFeed": "readonly",
+    "GeminiAssistant": "readonly",
+    "AccessibilityManager": "readonly",
+    "FirebaseService": "readonly",
+    "GoogleCloudServices": "readonly",
+    "TestSuite": "readonly",
+    "App": "readonly",
+    "firebase": "readonly",
+    "gtag": "readonly"
+  },
+  "rules": {
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
+    "no-console": "off",
+    "eqeqeq": ["error", "always"],
+    "curly": ["error", "multi-line"],
+    "no-var": "error",
+    "prefer-const": "warn",
+    "no-throw-literal": "error",
+    "no-implicit-globals": "off",
+    "no-eval": "error",
+    "no-implied-eval": "error",
+    "no-new-func": "error",
+    "no-script-url": "error",
+    "no-alert": "warn",
+    "consistent-return": "warn",
+    "default-case": "warn",
+    "no-fallthrough": "error",
+    "no-redeclare": "error",
+    "no-self-compare": "error",
+    "no-useless-return": "warn",
+    "no-duplicate-imports": "error"
+  },
+  "overrides": [
+    {
+      "files": ["server.js"],
+      "env": { "node": true, "browser": false },
+      "parserOptions": { "sourceType": "script" }
+    },
+    {
+      "files": ["sw.js"],
+      "env": { "serviceworker": true, "browser": false }
+    }
+  ]
+}

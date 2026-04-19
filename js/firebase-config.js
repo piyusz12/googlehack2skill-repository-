@@ -1,6 +1,7 @@
 /* ============================================
    VenueFlow — Firebase Configuration & Services
    ============================================
+   @module FirebaseService
    @description Initializes Firebase SDK with all services:
    - Firebase Authentication (anonymous sign-in)
    - Cloud Firestore (real-time database)
@@ -9,6 +10,8 @@
    - Firebase Cloud Messaging (push notifications)
    
    @integration Firebase JS SDK v10 (modular, tree-shakeable)
+   @version 2.1.0
+   @author VenueFlow Team
    @see https://firebase.google.com/docs/web/setup
    ============================================ */
 

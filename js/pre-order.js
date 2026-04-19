@@ -1,12 +1,43 @@
 /* ============================================
    VenueFlow — Concession Pre-Order System
+   ============================================
+   @module PreOrder
+   @description Food and beverage pre-ordering system.
+   Allows users to browse categorized menus, add items to cart,
+   and place orders with recommended pickup locations based on
+   real-time queue wait times.
+
+   @version 2.1.0
+   @author VenueFlow Team
    ============================================ */
 
 const PreOrder = (() => {
+  'use strict';
+
+  // ---------- Constants ----------
+
+  /** @const {number} GST tax rate (18%) */
+  const GST_RATE = 0.18;
+
+  /** @const {number} Time for order to move to 'preparing' status (ms) */
+  const ORDER_PREP_TIME_MS = 8000;
+
+  /** @const {number} Time for order to move to 'ready' status (ms) */
+  const ORDER_READY_TIME_MS = 16000;
+
+  // ---------- State ----------
+
+  /** @private {HTMLElement|null} */
   let container = null;
+
+  /** @private {Array<Object>} Cart items */
   let cart = [];
+
+  /** @private {Object|null} Currently active order */
   let activeOrder = null;
-  let currentCategory = 'burgers';
+
+  /** @private {string} Currently selected menu category */
+  let currentCategory = 'mains';
 
   const MENU = {
     mains: [
@@ -64,12 +95,20 @@ const PreOrder = (() => {
     { id: 'desserts', emoji: '🍨', label: 'Desserts' },
   ];
 
+  /**
+   * Initialize the pre-order system.
+   * @param {string} containerId - DOM container element ID
+   */
   function init(containerId) {
     container = document.getElementById(containerId);
     if (!container) return;
     render();
   }
 
+  /**
+   * Render the full pre-order UI (tabs, menu grid, cart).
+   * @private
+   */
   function render() {
     if (!container) return;
 
@@ -146,6 +185,12 @@ const PreOrder = (() => {
     }
   }
 
+  /**
+   * Add an item to the cart or increment its quantity.
+   * @param {string} itemId - Menu item ID
+   * @param {string} category - Menu category key
+   * @private
+   */
   function addToCart(itemId, category) {
     const existing = cart.find(c => c.itemId === itemId);
     if (existing) {
@@ -161,12 +206,22 @@ const PreOrder = (() => {
     render();
   }
 
+  /**
+   * Increment quantity of a cart item.
+   * @param {string} itemId - Cart item ID
+   * @private
+   */
   function incrementItem(itemId) {
     const item = cart.find(c => c.itemId === itemId);
     if (item) item.qty++;
     render();
   }
 
+  /**
+   * Decrement quantity of a cart item; removes if qty reaches 0.
+   * @param {string} itemId - Cart item ID
+   * @private
+   */
   function decrementItem(itemId) {
     const item = cart.find(c => c.itemId === itemId);
     if (item) {
@@ -178,9 +233,14 @@ const PreOrder = (() => {
     render();
   }
 
+  /**
+   * Render the cart panel with items, GST, totals, and checkout button.
+   * @returns {string} Cart HTML string
+   * @private
+   */
   function renderCart() {
     const subtotal = cart.reduce((sum, c) => sum + c.price * c.qty, 0);
-    const tax = subtotal * 0.18; // 18% GST calculation
+    const tax = subtotal * GST_RATE;
     const total = subtotal + tax;
 
     // Find recommended pickup
@@ -235,6 +295,11 @@ const PreOrder = (() => {
     `;
   }
 
+  /**
+   * Process checkout: create active order, clear cart, simulate progress.
+   * Saves order to Firestore via FirebaseService.
+   * @private
+   */
   function checkout() {
     if (cart.length === 0) return;
 
@@ -244,7 +309,7 @@ const PreOrder = (() => {
 
     activeOrder = {
       items: [...cart],
-      total: cart.reduce((sum, c) => sum + c.price * c.qty, 0) * 1.18,
+      total: cart.reduce((sum, c) => sum + c.price * c.qty, 0) * (1 + GST_RATE),
       status: 'placed', // placed → preparing → ready
       pickup: pickupStand?.name || 'Stand',
       timestamp: Date.now(),
@@ -261,7 +326,7 @@ const PreOrder = (() => {
         Utils.showToast('Order Update', 'Your order is being prepared! 🍳', 'info');
         render();
       }
-    }, 8000);
+    }, ORDER_PREP_TIME_MS);
 
     setTimeout(() => {
       if (activeOrder) {
@@ -269,9 +334,13 @@ const PreOrder = (() => {
         Utils.showToast('Order Ready! 🎉', `Pick up at ${activeOrder.pickup}`, 'success');
         render();
       }
-    }, 16000);
+    }, ORDER_READY_TIME_MS);
   }
 
+  /**
+   * Render the active order status card with progress steps.
+   * @private
+   */
   function renderActiveOrder() {
     const steps = ['placed', 'preparing', 'ready'];
     const currentStep = steps.indexOf(activeOrder.status);

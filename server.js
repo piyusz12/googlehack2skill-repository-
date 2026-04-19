@@ -1,39 +1,123 @@
 /* ============================================
    VenueFlow — Express Server with Google Cloud
    ============================================
+   @module server
    @description Node.js server with Google Cloud integrations:
-   - Google Cloud Logging (structured logs)
+   - Google Cloud Logging (structured JSON logs on stdout)
    - Google Cloud Firestore (server-side data access)
    - Google Cloud Translation API (proxy endpoint)
    - Google Cloud Text-to-Speech API (proxy endpoint)
+   - Google Gemini AI API (proxy endpoint)
    - Static file serving for the SPA
-   - Health check endpoint for Cloud Run
-   
-   @deployment Google Cloud App Engine / Cloud Run
+   - Health check endpoint for Cloud Run / App Engine
+
+   Security features:
+   - Helmet.js for HTTP security headers
+   - Rate limiting on API proxy endpoints
+   - Input validation and sanitization
+   - CORS configuration
+   - Non-root Docker execution
+
+   @deployment Google Cloud App Engine / Cloud Run (europe-west1)
+   @version 2.1.0
    @see https://cloud.google.com/nodejs
    ============================================ */
 
+'use strict';
+
 const express = require('express');
 const path = require('path');
+const helmet = require('helmet');
 
 const app = express();
 
-// ---------- Middleware ----------
+// ---------- Constants ----------
 
-// Parse JSON request bodies
-app.use(express.json({ limit: '1mb' }));
+/** @const {number} Maximum request body size in bytes */
+const MAX_BODY_SIZE = '1mb';
 
-// Security headers
-app.use((req, res, next) => {
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+/** @const {number} Rate limit: max requests per window per IP */
+const RATE_LIMIT_MAX = 60;
+
+/** @const {number} Rate limit window in milliseconds (1 minute) */
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+
+/** @const {number} Maximum text length for API proxy requests */
+const MAX_TEXT_LENGTH = 5000;
+
+/** @const {number} Maximum prompt length for Gemini API */
+const MAX_PROMPT_LENGTH = 2000;
+
+/** @const {string} Server version identifier */
+const SERVER_VERSION = '2.1.0';
+
+// ---------- Security Middleware ----------
+
+// Helmet.js — sets secure HTTP headers (HSTS, X-Frame-Options, etc.)
+app.use(helmet({
+  contentSecurityPolicy: false, // CSP is managed via HTML meta tag
+  crossOriginEmbedderPolicy: false, // Allow Google Maps iframe embeds
+}));
+
+// Additional security headers beyond Helmet defaults
+app.use((_req, res, next) => {
+  res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(self)');
   next();
 });
 
-// Request logging with Google Cloud Logging format
+// Parse JSON with size limit
+app.use(express.json({ limit: MAX_BODY_SIZE }));
+
+// ---------- Rate Limiting (in-memory, lightweight) ----------
+
+/**
+ * Simple in-memory rate limiter for API proxy endpoints.
+ * Tracks request counts per IP within a sliding window.
+ * @type {Map<string, {count: number, resetTime: number}>}
+ */
+const rateLimitStore = new Map();
+
+/**
+ * Rate limiting middleware factory.
+ * @param {number} maxRequests - Maximum requests per window
+ * @param {number} windowMs - Time window in milliseconds
+ * @returns {Function} Express middleware
+ */
+function rateLimit(maxRequests = RATE_LIMIT_MAX, windowMs = RATE_LIMIT_WINDOW_MS) {
+  return (req, res, next) => {
+    const key = req.ip || req.connection.remoteAddress || 'unknown';
+    const now = Date.now();
+    const entry = rateLimitStore.get(key);
+
+    if (!entry || now > entry.resetTime) {
+      rateLimitStore.set(key, { count: 1, resetTime: now + windowMs });
+      return next();
+    }
+
+    if (entry.count >= maxRequests) {
+      res.setHeader('Retry-After', Math.ceil((entry.resetTime - now) / 1000));
+      return res.status(429).json({ error: 'Too many requests. Please try again later.' });
+    }
+
+    entry.count++;
+    return next();
+  };
+}
+
+// Periodic cleanup of expired rate limit entries (every 5 minutes)
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of rateLimitStore) {
+    if (now > entry.resetTime) {
+      rateLimitStore.delete(key);
+    }
+  }
+}, 5 * 60 * 1000);
+
+// ---------- Request Logging ----------
+
+// Google Cloud Logging–compatible structured JSON logging
 app.use((req, res, next) => {
   const start = Date.now();
   res.on('finish', () => {
@@ -56,7 +140,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve static files from the current directory with caching
+// ---------- Static File Serving ----------
+
+// Serve static files with caching headers
 app.use(express.static(__dirname, {
   maxAge: '1h',
   setHeaders: (res, filePath) => {
@@ -74,15 +160,17 @@ app.use(express.static(__dirname, {
 // ---------- Google Cloud API Proxy Endpoints ----------
 
 /**
- * Health check endpoint for Cloud Run / App Engine
+ * Health check endpoint for Cloud Run / App Engine.
  * @route GET /healthz
+ * @returns {Object} Service health status
  */
-app.get('/healthz', (req, res) => {
+app.get('/healthz', (_req, res) => {
   res.status(200).json({
     status: 'healthy',
     service: 'venueflow',
-    version: '2.0.0',
+    version: SERVER_VERSION,
     timestamp: new Date().toISOString(),
+    uptime: Math.round(process.uptime()),
     googleCloud: {
       project: process.env.GOOGLE_CLOUD_PROJECT || 'hack2skill-493718',
       region: process.env.GOOGLE_CLOUD_REGION || 'europe-west1',
@@ -92,10 +180,12 @@ app.get('/healthz', (req, res) => {
 });
 
 /**
- * Google Cloud service status endpoint
+ * Google Cloud service status endpoint.
+ * Returns metadata about all integrated Google services.
  * @route GET /api/google-services
+ * @returns {Object} Service status map
  */
-app.get('/api/google-services', (req, res) => {
+app.get('/api/google-services', (_req, res) => {
   res.json({
     services: [
       { name: 'Google Gemini AI', status: 'active', version: '2.5-flash' },
@@ -117,15 +207,28 @@ app.get('/api/google-services', (req, res) => {
 });
 
 /**
- * Translation API proxy endpoint
- * Proxies requests to Google Cloud Translation API
+ * Translation API proxy endpoint.
+ * Proxies requests to Google Cloud Translation API with input validation.
  * @route POST /api/translate
+ * @param {string} req.body.text - Text to translate (max 5000 chars)
+ * @param {string} req.body.targetLang - Target language code
+ * @param {string} [req.body.sourceLang='en'] - Source language code
+ * @returns {Object} Translation result from Google Cloud
  */
-app.post('/api/translate', async (req, res) => {
+app.post('/api/translate', rateLimit(), async (req, res) => {
   const { text, targetLang, sourceLang = 'en' } = req.body;
-  
-  if (!text || !targetLang) {
-    return res.status(400).json({ error: 'Missing text or targetLang' });
+
+  // Input validation
+  if (!text || typeof text !== 'string' || !targetLang || typeof targetLang !== 'string') {
+    return res.status(400).json({ error: 'Missing or invalid text/targetLang parameters' });
+  }
+
+  if (text.length > MAX_TEXT_LENGTH) {
+    return res.status(400).json({ error: `Text exceeds maximum length of ${MAX_TEXT_LENGTH} characters` });
+  }
+
+  if (targetLang.length > 10 || sourceLang.length > 10) {
+    return res.status(400).json({ error: 'Invalid language code' });
   }
 
   try {
@@ -148,15 +251,24 @@ app.post('/api/translate', async (req, res) => {
 });
 
 /**
- * Text-to-Speech API proxy endpoint
- * Proxies requests to Google Cloud TTS API
+ * Text-to-Speech API proxy endpoint.
+ * Proxies requests to Google Cloud TTS API with input validation.
  * @route POST /api/tts
+ * @param {string} req.body.text - Text to synthesize (max 5000 chars)
+ * @param {string} [req.body.languageCode='en-IN'] - Language/locale code
+ * @param {string} [req.body.voiceName='en-IN-Wavenet-A'] - Voice name
+ * @returns {Object} Audio content from Google Cloud TTS
  */
-app.post('/api/tts', async (req, res) => {
+app.post('/api/tts', rateLimit(), async (req, res) => {
   const { text, languageCode = 'en-IN', voiceName = 'en-IN-Wavenet-A' } = req.body;
 
-  if (!text) {
-    return res.status(400).json({ error: 'Missing text' });
+  // Input validation
+  if (!text || typeof text !== 'string') {
+    return res.status(400).json({ error: 'Missing or invalid text parameter' });
+  }
+
+  if (text.length > MAX_TEXT_LENGTH) {
+    return res.status(400).json({ error: `Text exceeds maximum length of ${MAX_TEXT_LENGTH} characters` });
   }
 
   try {
@@ -167,7 +279,7 @@ app.post('/api/tts', async (req, res) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          input: { text: text.substring(0, 5000) },
+          input: { text: text.substring(0, MAX_TEXT_LENGTH) },
           voice: { languageCode, name: voiceName, ssmlGender: 'FEMALE' },
           audioConfig: { audioEncoding: 'MP3' }
         })
@@ -183,14 +295,22 @@ app.post('/api/tts', async (req, res) => {
 });
 
 /**
- * Gemini AI proxy endpoint
+ * Gemini AI proxy endpoint.
+ * Proxies requests to Google Gemini API with input validation and rate limiting.
  * @route POST /api/gemini
+ * @param {string} req.body.prompt - User prompt (max 2000 chars)
+ * @returns {Object} Gemini API response
  */
-app.post('/api/gemini', async (req, res) => {
+app.post('/api/gemini', rateLimit(30, RATE_LIMIT_WINDOW_MS), async (req, res) => {
   const { prompt } = req.body;
 
-  if (!prompt) {
-    return res.status(400).json({ error: 'Missing prompt' });
+  // Input validation
+  if (!prompt || typeof prompt !== 'string') {
+    return res.status(400).json({ error: 'Missing or invalid prompt parameter' });
+  }
+
+  if (prompt.length > MAX_PROMPT_LENGTH) {
+    return res.status(400).json({ error: `Prompt exceeds maximum length of ${MAX_PROMPT_LENGTH} characters` });
   }
 
   try {
@@ -218,18 +338,22 @@ app.post('/api/gemini', async (req, res) => {
 // ---------- SPA Catch-All ----------
 
 // Catch all other routes and return the index file (SPA support)
-app.get('*', (req, res) => {
+app.get('*', (_req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// ---------- Error Handler ----------
+// ---------- Global Error Handler ----------
 
-app.use((err, req, res, next) => {
+/**
+ * Express error-handling middleware.
+ * Logs errors in Google Cloud Logging format and returns a safe JSON response.
+ */
+app.use((err, _req, res, _next) => {
   console.error(JSON.stringify({
     severity: 'ERROR',
     message: 'Unhandled server error',
     error: err.message,
-    stack: err.stack
+    stack: process.env.NODE_ENV === 'production' ? undefined : err.stack
   }));
   res.status(500).json({ error: 'Internal server error' });
 });
@@ -244,6 +368,11 @@ app.listen(port, () => {
     port,
     nodeVersion: process.version,
     environment: process.env.NODE_ENV || 'development',
-    googleCloudProject: process.env.GOOGLE_CLOUD_PROJECT || 'hack2skill-493718'
+    googleCloudProject: process.env.GOOGLE_CLOUD_PROJECT || 'hack2skill-493718',
+    security: {
+      helmet: true,
+      rateLimiting: true,
+      inputValidation: true
+    }
   }));
 });

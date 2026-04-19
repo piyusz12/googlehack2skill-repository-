@@ -1,8 +1,37 @@
 /* ============================================
    VenueFlow — A* Navigation System
+   ============================================
+   @module Navigation
+   @description Crowd-optimized pathfinding using A* algorithm.
+   Finds the optimal route between any two zones in the stadium,
+   accounting for real-time crowd density as edge weights.
+
+   Features:
+   - A* pathfinding with Euclidean heuristic
+   - Dynamic crowd-density edge costs
+   - Custom accessible dropdown selectors
+   - ETA calculation with crowd slowdown factor
+
+   @version 2.1.0
+   @author VenueFlow Team
    ============================================ */
 
 const Navigation = (() => {
+  'use strict';
+
+  // ---------- Constants ----------
+
+  /** @const {number} How much crowd density increases traversal cost (0–100% maps to 1x–3x) */
+  const CROWD_COST_MULTIPLIER = 2;
+
+  /** @const {number} Base time in minutes per zone transition */
+  const ZONE_TRANSIT_TIME_MIN = 1.5;
+
+  /** @const {number} Crowd slowdown factor for ETA (density/100 * this) */
+  const CROWD_SLOWDOWN_FACTOR = 0.5;
+
+  /** @const {number} Heuristic distance scaling divisor */
+  const HEURISTIC_SCALE = 100;
   let container = null;
 
   // Simplified venue graph — adjacency with base costs
@@ -66,9 +95,13 @@ const Navigation = (() => {
 
   /** @private {string} Selected start zone ID */
   let selectedFrom = '';
-  /** @private {string} Selected to zone ID */
+  /** @private {string} Selected destination zone ID */
   let selectedTo = '';
 
+  /**
+   * Initialize the navigation component.
+   * @param {string} containerId - DOM container element ID
+   */
   function init(containerId) {
     container = document.getElementById(containerId);
     if (!container) return;
@@ -82,6 +115,10 @@ const Navigation = (() => {
     });
   }
 
+  /**
+   * Render the navigation UI with dropdowns and route results.
+   * @private
+   */
   function render() {
     if (!container) return;
 
@@ -150,6 +187,13 @@ const Navigation = (() => {
     setupDropdown('cs-to', 'dd-to', (val) => { selectedTo = val; render(); });
   }
 
+  /**
+   * Wire up a custom dropdown select element.
+   * @param {string} selectId - Custom select container ID
+   * @param {string} dropdownId - Dropdown panel ID
+   * @param {Function} onSelect - Callback when an option is selected
+   * @private
+   */
   function setupDropdown(selectId, dropdownId, onSelect) {
     const selectEl = document.getElementById(selectId);
     const dropdownEl = document.getElementById(dropdownId);
@@ -186,10 +230,18 @@ const Navigation = (() => {
     });
   }
 
+  /**
+   * Close all open custom dropdowns.
+   * @private
+   */
   function closeAllDropdowns() {
     document.querySelectorAll('.custom-select.open').forEach(el => el.classList.remove('open'));
   }
 
+  /**
+   * Find and display the optimal route between selected zones.
+   * @private
+   */
   function findRoute() {
     const fromId = selectedFrom;
     const toId = selectedTo;
@@ -214,6 +266,13 @@ const Navigation = (() => {
     displayRoute(path, resultEl);
   }
 
+  /**
+   * A* pathfinding algorithm with crowd-density edge weights.
+   * @param {string} startId - Start zone ID
+   * @param {string} goalId - Destination zone ID
+   * @returns {string[]|null} Ordered array of zone IDs, or null if no path
+   * @private
+   */
   function astar(startId, goalId) {
     if (!GRAPH[startId] || !GRAPH[goalId]) return null;
 
@@ -258,7 +317,7 @@ const Navigation = (() => {
         // Edge cost = base cost * crowd density multiplier
         const zoneData = CrowdSimulator.getZoneData();
         const density = zoneData[neighborId]?.density || 50;
-        const crowdMultiplier = 1 + (density / 100) * 2; // density increases cost by up to 3x
+        const crowdMultiplier = 1 + (density / 100) * CROWD_COST_MULTIPLIER; // density increases cost by up to 3x
         const tentativeG = gScore[current] + GRAPH[neighborId].baseCost * crowdMultiplier;
 
         if (tentativeG < gScore[neighborId]) {
@@ -273,13 +332,28 @@ const Navigation = (() => {
     return null; // No path found
   }
 
+  /**
+   * Euclidean distance heuristic for A*.
+   * @param {string} aId - Zone A ID
+   * @param {string} bId - Zone B ID
+   * @param {Object} zoneMap - Map of zone ID to zone definition
+   * @returns {number} Estimated distance cost
+   * @private
+   */
   function heuristic(aId, bId, zoneMap) {
     const a = zoneMap[aId];
     const b = zoneMap[bId];
     if (!a || !b) return 0;
-    return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2)) / 100;
+    return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2)) / HEURISTIC_SCALE;
   }
 
+  /**
+   * Reconstruct path from A* cameFrom map.
+   * @param {Object} cameFrom - Map of node to predecessor
+   * @param {string} current - Goal node ID
+   * @returns {string[]} Ordered path from start to goal
+   * @private
+   */
   function reconstructPath(cameFrom, current) {
     const path = [current];
     while (cameFrom[current]) {
@@ -289,6 +363,12 @@ const Navigation = (() => {
     return path;
   }
 
+  /**
+   * Display the found route with waypoints, density badges, and ETA.
+   * @param {string[]} path - Ordered array of zone IDs
+   * @param {HTMLElement} resultEl - DOM element to render into
+   * @private
+   */
   function displayRoute(path, resultEl) {
     const zoneData = CrowdSimulator.getZoneData();
     const zones = CrowdSimulator.getZones();
@@ -296,12 +376,12 @@ const Navigation = (() => {
     zones.forEach(z => zoneMap[z.id] = z);
 
     // Calculate ETA
-    const walkingSpeedMetersPerMin = 80; // Average walking speed in venue
+    const walkingSpeedMetersPerMin = 80;
     let totalCost = 0;
     for (let i = 1; i < path.length; i++) {
       const density = zoneData[path[i]]?.density || 50;
-      const crowdFactor = 1 + (density / 100) * 0.5; // slower in crowds
-      totalCost += 1.5 * crowdFactor; // ~1.5 min per zone transition
+      const crowdFactor = 1 + (density / 100) * CROWD_SLOWDOWN_FACTOR;
+      totalCost += ZONE_TRANSIT_TIME_MIN * crowdFactor;
     }
     const etaMinutes = Math.round(totalCost);
 

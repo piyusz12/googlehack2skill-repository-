@@ -1,0 +1,11 @@
+.git
+.gitignore
+.gcloudignore
+.eslintrc.json
+.prettierrc
+.dockerignore
+node_modules
+npm-debug.log
+README.md
+deploy.sh
+cloudbuild.yaml

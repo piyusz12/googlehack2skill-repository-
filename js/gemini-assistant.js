@@ -1,6 +1,7 @@
 /* ============================================
    VenueFlow — Gemini AI Venue Assistant
    ============================================
+   @module GeminiAssistant
    @description AI-powered venue assistant using Google Gemini API.
    Provides contextual venue guidance, crowd recommendations,
    food suggestions, and wayfinding help.
